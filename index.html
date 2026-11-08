@@ -5,16 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Setlist - Atril Digital & Gestión de Repertorio</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Librería html2pdf.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
-    <!-- SDKs de Firebase (Compatibles para HTML sencillo) -->
+    <!-- SDKs de Firebase -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
     <script>
-        // Configuración de tu proyecto Firebase
         const firebaseConfig = {
           apiKey: "AIzaSyCLSkBIt3W5E09azFEalZK1ydk5fnmLW84",
           authDomain: "atril-virtual.firebaseapp.com",
@@ -24,8 +22,6 @@
           appId: "1:84930759933:web:5a7ccd19c965e5b7c34294",
           measurementId: "G-6X08W1G4FP"
         };
-
-        // Inicializar Firebase, Auth y Firestore
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.firestore();
@@ -65,8 +61,8 @@
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         .chord-lyric-block {
-            white-space: pre;
-            line-height: 1.6rem;
+            white-space: pre-wrap;
+            line-height: 1.7rem;
             font-family: monospace;
         }
         .section-card:target {
@@ -76,22 +72,12 @@
 
         .chords-bold .chord-item { font-weight: 900 !important; }
         .chords-normal .chord-item { font-weight: normal !important; }
-
         .lyrics-bold .lyric-item { font-weight: bold !important; }
         .lyrics-normal .lyric-item { font-weight: normal !important; }
 
-        .chord-item {
-            font-family: monospace;
-            color: var(--chord-color, #ffffff);
-        }
-        .lyric-item {
-            font-family: monospace;
-            color: #a1a1aa;
-        }
-
-        .lyrics-only .chord-item {
-            display: none !important;
-        }
+        .chord-item { font-family: monospace; color: var(--chord-color, #ffffff); }
+        .lyric-item { font-family: monospace; color: #a1a1aa; }
+        .lyrics-only .chord-item { display: none !important; }
 
         .size-sm .chord-lyric-block { font-size: 0.875rem; }
         .size-base .chord-lyric-block { font-size: 1rem; }
@@ -99,13 +85,8 @@
         .size-xl .chord-lyric-block { font-size: 1.5rem; }
         .size-2xl .chord-lyric-block { font-size: 1.875rem; }
 
-        /* Estilos de la Pizarra de Anotaciones */
-        .btn-futuristic {
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .btn-futuristic:active {
-            transform: scale(0.92);
-        }
+        .btn-futuristic { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
+        .btn-futuristic:active { transform: scale(0.92); }
         .user-text-input {
             background: rgba(15, 23, 42, 0.85);
             border: 1px solid rgba(99, 102, 241, 0.5);
@@ -116,7 +97,7 @@
 
         @media print {
             body { background: white !important; color: black !important; }
-            header, button, .no-print, #floatingToolbar, #configMenu { display: none !important; }
+            header, button, .no-print, #floatingToolbar, #configMenu, #scrollMenu, #keyMenu, #capoMenu { display: none !important; }
             #printPreviewModal { position: static !important; background: white !important; }
             .bg-white { background: white !important; border: none !important; box-shadow: none !important; }
         }
@@ -124,7 +105,7 @@
 </head>
 <body class="bg-stage-bg text-zinc-100 min-h-screen flex flex-col antialiased selection:bg-indigo-500 selection:text-white">
 
-    <!-- ==================== VISTA 0: AUTENTICACIÓN (LOGIN / REGISTRO) ==================== -->
+    <!-- ==================== AUTENTICACIÓN ==================== -->
     <div id="authView" class="fixed inset-0 z-50 bg-stage-bg flex items-center justify-center p-4 hidden">
         <div class="bg-stage-card border border-stage-cardBorder rounded-2xl max-w-md w-full p-6 md:p-8 shadow-2xl flex flex-col gap-6">
             <div class="text-center space-y-1">
@@ -134,19 +115,16 @@
                 </h1>
                 <p class="text-xs text-zinc-400 uppercase tracking-wider font-medium">Inicia sesión para acceder al atril</p>
             </div>
-
             <div class="space-y-4">
                 <button onclick="loginWithGoogle()" class="w-full flex items-center justify-center gap-3 py-3 px-4 rounded-xl bg-white hover:bg-zinc-100 text-zinc-900 text-xs font-bold transition shadow-sm active:scale-95">
                     <svg class="w-4 h-4" viewBox="0 0 24 24"><path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-8.17z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.19v3.15C3.17 21.32 7.22 24 12 24z"/><path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.19C.43 8.12 0 9.87 0 11.7s.43 3.58 1.19 5.12l4.09-3.15z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.22 0 3.17 2.68 1.19 6.58l4.09 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/></svg>
                     Continuar con Google
                 </button>
-
                 <div class="relative flex py-2 items-center">
                     <div class="flex-grow border-t border-stage-cardBorder"></div>
                     <span class="flex-shrink mx-4 text-[10px] text-zinc-500 uppercase tracking-wider font-semibold">o con correo</span>
                     <div class="flex-grow border-t border-stage-cardBorder"></div>
                 </div>
-
                 <div class="space-y-3 text-xs">
                     <div>
                         <label class="text-zinc-400 font-semibold block mb-1">Correo electrónico</label>
@@ -157,7 +135,6 @@
                         <input type="password" id="authPassword" placeholder="••••••••" class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-3.5 py-2.5 text-white focus:outline-none focus:border-indigo-500">
                     </div>
                 </div>
-
                 <div class="flex flex-col gap-2 pt-2">
                     <button onclick="loginWithEmail()" class="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-xs font-bold text-white transition shadow-sm">Iniciar Sesión</button>
                     <button onclick="registerWithEmail()" class="w-full py-2.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-xs font-bold text-zinc-300 transition">Registrarme</button>
@@ -166,8 +143,7 @@
         </div>
     </div>
 
-
-    <!-- ==================== VISTA 1: INICIO Y REPERTORIO / EVENTOS ==================== -->
+    <!-- ==================== VISTA 1: INICIO ==================== -->
     <div id="homeView" class="flex-1 max-w-6xl w-full mx-auto p-4 md:p-8 flex flex-col gap-6 hidden">
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-stage-cardBorder pb-6">
             <div>
@@ -177,50 +153,37 @@
                 </h1>
                 <p id="userEmailDisplay" class="text-xs text-zinc-400 mt-1 uppercase tracking-wider font-medium">Cargando perfil...</p>
             </div>
-            
-            <!-- Pestañas de Navegación (Repertorio / Eventos) y Botones -->
             <div class="flex flex-wrap items-center gap-3">
                 <div class="bg-stage-card border border-stage-cardBorder rounded-xl p-1 flex items-center gap-1 text-xs font-semibold">
                     <button id="tabSongsBtn" onclick="switchHomeTab('songs')" class="px-3 py-1.5 rounded-lg bg-indigo-600 text-white transition">Repertorio</button>
                     <button id="tabEventsBtn" onclick="switchHomeTab('events')" class="px-3 py-1.5 rounded-lg text-zinc-400 hover:text-white transition">Eventos</button>
                 </div>
-
                 <button id="primaryActionBtn" onclick="openCreateModal()" class="flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-zinc-100 hover:bg-white text-xs font-bold text-zinc-900 transition shadow-sm active:scale-95">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path></svg>
                     <span id="primaryBtnText">Nueva Canción</span>
                 </button>
-
                 <button onclick="logout()" title="Cerrar sesión" class="p-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-white transition border border-zinc-700">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
                 </button>
             </div>
         </div>
-
-        <!-- Buscador (Solo visible en repertorio) -->
         <div id="searchContainer" class="relative">
             <input type="text" id="searchInput" oninput="filterSongs()" placeholder="Buscar por título o artista..." class="w-full bg-stage-card border border-stage-cardBorder rounded-xl px-4 py-3 pl-11 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-indigo-500 transition shadow-inner">
             <svg class="w-4 h-4 text-zinc-500 absolute left-3.5 top-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
         </div>
-
-        <!-- Contenedor de Canciones -->
         <div id="songListGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
-
-        <!-- Contenedor de Eventos (Oculto por defecto) -->
         <div id="eventListGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 hidden"></div>
     </div>
 
-
-    <!-- ==================== VISTA 2: ATRIL DIGITAL (MODO EN VIVO) ==================== -->
+    <!-- ==================== VISTA 2: ATRIL DIGITAL ==================== -->
     <div id="readerView" class="hidden flex-1 flex flex-col relative">
         <header class="sticky top-0 z-40 bg-stage-bg/90 backdrop-blur-md border-b border-stage-cardBorder px-4 py-2.5 shadow-sm">
             <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
                 <div class="flex items-center gap-3">
                     <button onclick="showHomeView()" title="Regresar al repertorio" class="p-2 rounded-xl bg-stage-card border border-stage-cardBorder text-zinc-400 hover:text-white transition relative group">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
-                        <span class="absolute top-full left-0 mt-1.5 hidden group-hover:block bg-zinc-800 text-zinc-200 text-[10px] font-medium px-2 py-1 rounded shadow-lg border border-zinc-700 whitespace-nowrap z-50">Regresar</span>
                     </button>
                     
-                    <!-- Navegación de Evento Activo (Anterior / Siguiente Canción) -->
                     <div id="eventPlaylistNav" class="hidden items-center gap-2 bg-stage-card border border-stage-cardBorder px-3 py-1 rounded-xl text-xs">
                         <button onclick="prevEventSong()" class="p-1 hover:text-indigo-400 transition" title="Canción Anterior">◀</button>
                         <span id="eventPlaylistInfo" class="font-mono text-zinc-300">1 / 1</span>
@@ -230,67 +193,89 @@
                     <div id="structureBar" class="flex items-center gap-2 overflow-x-auto no-scrollbar py-1 scroll-smooth max-w-xs sm:max-w-sm md:max-w-md"></div>
                 </div>
 
-                <!-- CONTROLES MINIMALISTAS CON TOOLTIPS FLOTANTES Y BOTÓN ANOTAR -->
-                <div class="flex flex-wrap items-center gap-1.5 shrink-0 bg-stage-card border border-stage-cardBorder rounded-xl p-1">
+                <!-- CONTROLES SUPERIORES -->
+                <div class="flex flex-wrap items-center gap-1.5 shrink-0 bg-stage-card border border-stage-cardBorder rounded-xl p-1 relative">
                     
-                    <!-- Botón Anotar / Herramientas de Dibujo -->
-                    <button id="btnToggleToolbar" class="btn-futuristic px-3 py-1.5 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 rounded-lg text-xs font-mono tracking-wider transition-all flex items-center space-x-1.5 shadow-sm">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
-                        <span>Anotar</span>
+                    <!-- Botón Anotar -->
+                    <button id="btnToggleToolbar" class="btn-futuristic p-2 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 rounded-lg transition-all flex items-center justify-center shadow-sm" title="Modo Anotar">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
                     </button>
 
                     <div class="h-4 w-px bg-zinc-800 mx-0.5"></div>
 
-                    <!-- Control Tono -->
-                    <div class="flex items-center gap-1 px-2 py-1 bg-zinc-900/50 rounded-lg border border-zinc-800 relative group">
-                        <span class="text-[10px] uppercase tracking-wider text-zinc-400 font-bold">Tono</span>
-                        <button onclick="changeKey(-1)" class="w-6 h-6 rounded-md bg-zinc-800 hover:bg-zinc-700 flex items-center justify-center font-bold text-xs text-zinc-200 transition">-</button>
-                        <span id="keyDisplay" class="text-xs font-bold w-6 text-center text-indigo-400">0</span>
-                        <button onclick="changeKey(1)" class="w-6 h-6 rounded-md bg-zinc-800 hover:bg-zinc-700 flex items-center justify-center font-bold text-xs text-zinc-200 transition">+</button>
-                        <span class="absolute top-full left-1/2 -translate-x-1/2 mt-1.5 hidden group-hover:block bg-zinc-800 text-zinc-200 text-[10px] font-medium px-2 py-1 rounded shadow-lg border border-zinc-700 whitespace-nowrap z-50">Transportar Tonalidad</span>
+                    <!-- CONTROL DE TONO -->
+                    <div class="relative">
+                        <button onclick="toggleKeyMenu(event)" class="px-2.5 py-1.5 bg-zinc-900/80 hover:bg-zinc-800 border border-zinc-800 rounded-lg flex items-center gap-1.5 transition text-xs relative group shadow-sm" title="Cambiar Tono">
+                            <svg class="w-3.5 h-3.5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"></path></svg>
+                            <span id="currentKeyBadge" class="font-mono font-bold text-indigo-400">C</span>
+                        </button>
+
+                        <div id="keyMenu" class="absolute right-0 top-full mt-2 bg-gray-950/95 backdrop-blur-xl border border-white/10 rounded-xl p-3 shadow-2xl hidden z-50 w-52 space-y-2">
+                            <div class="flex items-center justify-between border-b border-white/10 pb-1.5">
+                                <span class="text-[10px] font-mono tracking-wider text-zinc-400 uppercase font-semibold">Tonalidad</span>
+                                <span id="origKeyInfo" class="text-[9px] font-mono text-indigo-300">Orig: C</span>
+                            </div>
+                            <div id="keyNotesGrid" class="grid grid-cols-4 gap-1.5"></div>
+                            <button onclick="resetKeyToOriginal()" class="w-full py-1 text-[10px] font-mono font-bold bg-zinc-800/80 hover:bg-zinc-700 text-zinc-300 hover:text-white rounded-lg border border-zinc-700/50 transition">
+                                Restablecer Original
+                            </button>
+                        </div>
                     </div>
 
-                    <!-- Control Capo -->
-                    <div class="flex items-center gap-1 px-2 py-1 bg-zinc-900/50 rounded-lg border border-zinc-800 relative group">
-                        <span class="text-[10px] uppercase tracking-wider text-zinc-400 font-bold">Capo</span>
-                        <select id="capoSelect" onchange="updateView()" class="bg-zinc-800 text-xs text-zinc-200 rounded-md px-1.5 py-0.5 focus:outline-none border border-zinc-700 font-semibold cursor-pointer">
-                            <option value="0">0</option>
-                            <option value="1">1</option>
-                            <option value="2">2</option>
-                            <option value="3">3</option>
-                            <option value="4">4</option>
-                            <option value="5">5</option>
-                        </select>
-                        <span class="absolute top-full left-1/2 -translate-x-1/2 mt-1.5 hidden group-hover:block bg-zinc-800 text-zinc-200 text-[10px] font-medium px-2 py-1 rounded shadow-lg border border-zinc-700 whitespace-nowrap z-50">Cejilla / Capodastro</span>
+                    <!-- CONTROL DE CAPO -->
+                    <div class="relative">
+                        <button onclick="toggleCapoMenu(event)" class="px-2.5 py-1.5 bg-zinc-900/80 hover:bg-zinc-800 border border-zinc-800 rounded-lg flex items-center gap-1.5 transition text-xs relative group shadow-sm" title="Cejilla / Capodastro">
+                            <svg class="w-3.5 h-3.5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                            <span id="currentCapoBadge" class="font-mono font-bold text-amber-400">0</span>
+                        </button>
+
+                        <div id="capoMenu" class="absolute right-0 top-full mt-2 bg-gray-950/95 backdrop-blur-xl border border-white/10 rounded-xl p-3 shadow-2xl hidden z-50 w-36 space-y-2">
+                            <div class="border-b border-white/10 pb-1.5">
+                                <span class="text-[10px] font-mono tracking-wider text-zinc-400 uppercase font-semibold">Traste Capo</span>
+                            </div>
+                            <div class="grid grid-cols-3 gap-1.5">
+                                <button onclick="setCapoValue(0)" class="capo-opt py-1 text-xs font-mono font-bold rounded-lg bg-zinc-900 text-white border border-zinc-800 hover:bg-zinc-800">0</button>
+                                <button onclick="setCapoValue(1)" class="capo-opt py-1 text-xs font-mono font-bold rounded-lg bg-zinc-900 text-white border border-zinc-800 hover:bg-zinc-800">1</button>
+                                <button onclick="setCapoValue(2)" class="capo-opt py-1 text-xs font-mono font-bold rounded-lg bg-zinc-900 text-white border border-zinc-800 hover:bg-zinc-800">2</button>
+                                <button onclick="setCapoValue(3)" class="capo-opt py-1 text-xs font-mono font-bold rounded-lg bg-zinc-900 text-white border border-zinc-800 hover:bg-zinc-800">3</button>
+                                <button onclick="setCapoValue(4)" class="capo-opt py-1 text-xs font-mono font-bold rounded-lg bg-zinc-900 text-white border border-zinc-800 hover:bg-zinc-800">4</button>
+                                <button onclick="setCapoValue(5)" class="capo-opt py-1 text-xs font-mono font-bold rounded-lg bg-zinc-900 text-white border border-zinc-800 hover:bg-zinc-800">5</button>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="h-4 w-px bg-zinc-800 mx-0.5"></div>
 
-                    <!-- Botón Imprimir / Exportar -->
-                    <button onclick="openPrintPreview()" class="p-2 rounded-lg bg-zinc-900/50 hover:bg-zinc-800 text-zinc-300 hover:text-white transition relative group flex items-center justify-center border border-zinc-800">
+                    <!-- Botón Editar -->
+                    <button onclick="editCurrentSong()" class="p-2 rounded-lg bg-zinc-900/50 hover:bg-zinc-800 text-zinc-300 hover:text-white transition flex items-center justify-center border border-zinc-800" title="Editar Canción">
+                        <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                    </button>
+
+                    <!-- Botón Imprimir -->
+                    <button onclick="openPrintPreview()" class="p-2 rounded-lg bg-zinc-900/50 hover:bg-zinc-800 text-zinc-300 hover:text-white transition flex items-center justify-center border border-zinc-800" title="Imprimir / PDF">
                         <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
-                        <span class="absolute top-full right-0 mt-1.5 hidden group-hover:block bg-zinc-800 text-zinc-200 text-[10px] font-medium px-2 py-1 rounded shadow-lg border border-zinc-700 whitespace-nowrap z-50">Imprimir / Exportar PDF o Imagen</span>
                     </button>
 
                     <!-- Botón Ajustes -->
-                    <button onclick="openSettingsModal()" class="p-2 rounded-lg bg-zinc-900/50 hover:bg-zinc-800 text-zinc-300 hover:text-white transition relative group flex items-center justify-center border border-zinc-800">
+                    <button onclick="openSettingsModal()" class="p-2 rounded-lg bg-zinc-900/50 hover:bg-zinc-800 text-zinc-300 hover:text-white transition flex items-center justify-center border border-zinc-800" title="Ajustes">
                         <svg class="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
-                        <span class="absolute top-full right-0 mt-1.5 hidden group-hover:block bg-zinc-800 text-zinc-200 text-[10px] font-medium px-2 py-1 rounded shadow-lg border border-zinc-700 whitespace-nowrap z-50">Ajustes de visualización</span>
                     </button>
 
                     <div class="h-4 w-px bg-zinc-800 mx-0.5"></div>
 
-                    <!-- Botón Auto-Scroll -->
-                    <button id="scrollToggleBtn" onclick="toggleAutoScroll()" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-xs font-bold text-white transition relative group shadow-sm">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
-                        <span id="scrollBtnText">Scroll</span>
-                        <span class="absolute top-full right-0 mt-1.5 hidden group-hover:block bg-zinc-800 text-zinc-200 text-[10px] font-medium px-2 py-1 rounded shadow-lg border border-zinc-700 whitespace-nowrap z-50">Desplazamiento automático</span>
-                    </button>
+                    <!-- BOTÓN SCROLL -->
+                    <div class="relative">
+                        <button id="scrollMenuToggleBtn" onclick="toggleScrollMenu(event)" class="p-2 rounded-lg bg-zinc-900/50 hover:bg-zinc-800 text-zinc-300 hover:text-white transition flex items-center justify-center border border-zinc-800" title="Desplazamiento Automático">
+                            <svg class="w-4 h-4 text-blue-400 fill-current" viewBox="0 0 24 24">
+                                <path d="M4.5 7.5c-.8 0-1.3.9-.8 1.6l7.5 10.5c.4.5 1.2.5 1.6 0l7.5-10.5c.5-.7 0-1.6-.8-1.6H4.5z"/>
+                            </svg>
+                        </button>
+                    </div>
+
                 </div>
             </div>
         </header>
 
-        <!-- Contenedor principal del Visor con Canvas Superpuesto -->
         <main id="readerMainContainer" class="flex-1 max-w-5xl w-full mx-auto p-4 md:p-6 space-y-4 chords-bold lyrics-normal size-lg relative select-none">
             <div class="flex flex-wrap items-center justify-between gap-4 mb-2 px-1">
                 <div>
@@ -309,54 +294,60 @@
             </div>
 
             <div id="chartContainer" class="space-y-4 relative"></div>
-
-            <!-- Capa del Canvas de Anotaciones (Transparente por encima del texto) -->
             <canvas id="annotationCanvas" class="absolute inset-0 w-full h-full pointer-events-none z-30"></canvas>
         </main>
     </div>
 
-    <!-- ==================== BARRA FLOTANTE FUTURISTA DE HERRAMIENTAS ==================== -->
+    <!-- MENÚ EMERGENTE DE SCROLL EN LA PARTE INFERIOR -->
+    <div id="scrollMenu" class="fixed bottom-6 left-1/2 -translate-x-1/2 bg-gray-950/95 backdrop-blur-xl border border-white/10 rounded-2xl px-5 py-3 shadow-[0_10px_30px_rgba(0,0,0,0.8)] hidden z-50 flex items-center gap-4">
+        <div class="flex flex-col gap-1">
+            <span class="text-[9px] uppercase tracking-wider text-zinc-400 font-mono font-semibold">Velocidad</span>
+            <select id="scrollSpeedSelect" onchange="changeScrollSpeed(this.value)" class="bg-zinc-800 text-xs text-white rounded-lg px-2 py-1.5 focus:outline-none border border-zinc-700 font-semibold cursor-pointer">
+                <option value="0">0 (Parado)</option>
+                <option value="1">1</option>
+                <option value="2" selected>2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5 (Rápido)</option>
+            </select>
+        </div>
+        <div class="h-8 w-px bg-zinc-800"></div>
+        <div class="flex flex-col gap-1">
+            <span class="text-[9px] uppercase tracking-wider text-zinc-400 font-mono font-semibold">Estado</span>
+            <button id="scrollPlayBtn" onclick="toggleAutoScroll()" class="flex items-center justify-center p-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white transition shadow-sm" title="Reproducir / Pausar">
+                <svg id="scrollPlayIcon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- BARRA FLOTANTE DE ANOTACIONES -->
     <div id="floatingToolbar" class="fixed bottom-6 left-1/2 -translate-x-1/2 bg-gray-950/80 backdrop-blur-xl border border-white/10 px-3 py-2 rounded-full shadow-[0_0_25px_rgba(0,0,0,0.5)] flex items-center space-x-1.5 z-50 hidden transition-all duration-300">
-        
         <!-- Lápiz -->
         <button id="toolPen" class="btn-futuristic tool-btn p-2 rounded-full text-gray-400 hover:text-white transition-colors" title="Lápiz">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
         </button>
-
-        <!-- Resaltador -->
-        <button id="toolHighlighter" class="btn-futuristic tool-btn p-2 rounded-full text-gray-400 hover:text-white transition-colors" title="Resaltador">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M7 21h10M12 3v14m-5-4l5 4 5-4"></path></svg>
+        <!-- Marcador (Punta biselada gruesa) -->
+        <button id="toolHighlighter" class="btn-futuristic tool-btn p-2 rounded-full text-gray-400 hover:text-white transition-colors" title="Marcador">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M9.5 3h5l4 4v2.5a1 1 0 01-.3.7l-9 9a1 1 0 01-.7.3H6.5a1 1 0 01-1-1v-3.5a1 1 0 01.3-.7l3.7-3.7V3z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M3 21h18"></path></svg>
         </button>
-
         <!-- Texto -->
-        <button id="toolText" class="btn-futuristic tool-btn p-2 rounded-full text-gray-400 hover:text-white transition-colors font-mono font-bold text-xs" title="Texto">
-            T
+        <button id="toolText" class="btn-futuristic tool-btn p-2 rounded-full text-gray-400 hover:text-white transition-colors font-mono font-bold text-xs" title="Texto">T</button>
+        <!-- Goma / Borrador (Icono de borrador clásico) -->
+        <button id="toolEraser" class="btn-futuristic tool-btn p-2 rounded-full text-gray-400 hover:text-white transition-colors" title="Goma">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M19 21H9l-5.414-5.414a2 2 0 010-2.828l8.586-8.586a2 2 0 012.828 0L21 9.172a2 2 0 010 2.828L13 20h6v1z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="m7 11 8 8"></path></svg>
         </button>
-
-        <!-- Borrador -->
-        <button id="toolEraser" class="btn-futuristic tool-btn p-2 rounded-full text-gray-400 hover:text-white transition-colors" title="Borrador">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-        </button>
-
         <div class="h-4 w-px bg-white/10 mx-1"></div>
-
-        <!-- Indicador de Color -->
         <button id="btnColorPicker" class="btn-futuristic w-5 h-5 rounded-full border border-white/40 shadow-sm transition-transform hover:scale-110" style="background-color: #facc15;" title="Color"></button>
-
-        <!-- Indicador de Grosor / Tamaño -->
-        <button id="btnSizeDisplay" class="btn-futuristic font-mono text-[10px] font-medium bg-white/5 hover:bg-white/10 px-2 py-1 rounded-full text-gray-300 border border-white/5">
-            <span id="sizeLabel">3px</span>
-        </button>
-
+        <button id="btnSizeDisplay" class="btn-futuristic font-mono text-[10px] font-medium bg-white/5 hover:bg-white/10 px-2 py-1 rounded-full text-gray-300 border border-white/5"><span id="sizeLabel">3px</span></button>
         <div class="h-4 w-px bg-white/10 mx-1"></div>
-
-        <!-- Limpiar Todo -->
-        <button id="btnClearAll" class="btn-futuristic p-2 rounded-full text-red-400/70 hover:text-red-400 hover:bg-red-500/10 transition-colors" title="Limpiar">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M6 18L18 6M6 6l12 12"></path></svg>
+        <button id="btnClearAll" class="btn-futuristic p-2 rounded-full text-red-400/70 hover:text-red-400 hover:bg-red-500/10 transition-colors" title="Limpiar todo">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
         </button>
     </div>
 
-    <!-- ==================== MENÚ DESPLEGABLE DE CONFIGURACIÓN ==================== -->
+    <!-- MENÚ DE CONFIGURACIÓN DE TRAZOS -->
     <div id="configMenu" class="fixed bottom-20 left-1/2 -translate-x-1/2 bg-gray-950/90 backdrop-blur-xl border border-white/10 rounded-2xl p-4 shadow-[0_10px_30px_rgba(0,0,0,0.8)] hidden z-50 w-64 space-y-4">
         <div>
             <label class="block text-[10px] font-mono tracking-widest text-gray-400 mb-2 uppercase">Color</label>
@@ -382,55 +373,40 @@
         </div>
     </div>
 
-
-    <!-- ==================== MODAL DE VISTA PREVIA DE IMPRESIÓN ==================== -->
+    <!-- MODAL DE IMPRESIÓN -->
     <div id="printPreviewModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-2 sm:p-4 hidden">
         <div class="bg-white text-black rounded-2xl max-w-3xl w-full p-6 shadow-2xl flex flex-col max-h-[95vh]">
-            
             <div class="flex items-center justify-between border-b border-zinc-200 pb-3 mb-4 no-print">
                 <div>
                     <h3 class="text-base font-black text-zinc-900">Vista Previa de Exportación</h3>
-                    <p class="text-[11px] text-zinc-500">Documento en alta resolución optimizado para impresión</p>
+                    <p class="text-[11px] text-zinc-500">Documento optimizado para impresión</p>
                 </div>
                 <div class="flex items-center gap-2">
-                    <button onclick="downloadPDF()" class="px-3 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-xs font-bold text-white transition flex items-center gap-1.5 shadow-sm">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                        PDF
-                    </button>
-                    <button onclick="downloadImage2D()" class="px-3 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-xs font-bold text-white transition flex items-center gap-1.5 shadow-sm">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                        Imagen (PNG)
-                    </button>
+                    <button onclick="downloadPDF()" class="px-3 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-xs font-bold text-white transition flex items-center gap-1.5 shadow-sm">PDF</button>
+                    <button onclick="downloadImage2D()" class="px-3 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-xs font-bold text-white transition flex items-center gap-1.5 shadow-sm">Imagen</button>
                     <button onclick="closePrintPreview()" class="p-2 rounded-xl bg-zinc-100 hover:bg-zinc-200 text-zinc-700 font-bold text-xs ml-2">&times;</button>
                 </div>
             </div>
-
-            <div id="printSheetContainer" class="flex-1 overflow-y-auto bg-white border border-zinc-200 rounded-xl p-6 space-y-4 font-mono text-sm text-zinc-900 shadow-inner">
-            </div>
-
+            <div id="printSheetContainer" class="flex-1 overflow-y-auto bg-white border border-zinc-200 rounded-xl p-6 space-y-4 font-mono text-sm text-zinc-900 shadow-inner"></div>
         </div>
     </div>
 
-
-    <!-- ==================== MODAL DE AJUSTES ==================== -->
+    <!-- MODAL DE AJUSTES -->
     <div id="settingsModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 hidden">
         <div class="bg-stage-card border border-stage-cardBorder rounded-2xl max-w-sm w-full p-6 shadow-2xl flex flex-col gap-5 text-zinc-200">
             <div class="flex items-center justify-between border-b border-stage-cardBorder pb-3">
                 <h3 class="text-sm font-black uppercase tracking-wider text-white">Ajustes de visualización</h3>
                 <button onclick="closeSettingsModal()" class="text-zinc-400 hover:text-white text-lg font-bold">&times;</button>
             </div>
-
             <div class="space-y-3 text-xs">
                 <div class="flex items-center justify-between bg-zinc-900/50 px-3.5 py-3 rounded-xl border border-zinc-800">
                     <span class="font-medium">Solo letra (Cantantes)</span>
                     <input type="checkbox" id="onlyLyricsToggle" onchange="toggleOnlyLyrics(this.checked)" class="w-4 h-4 rounded bg-zinc-900 border-zinc-700 text-indigo-600 focus:ring-0 cursor-pointer">
                 </div>
-
                 <div class="flex items-center justify-between bg-zinc-900/50 px-3.5 py-3 rounded-xl border border-zinc-800">
                     <span class="font-medium">Color de Acordes</span>
                     <input type="color" id="chordColorPicker" value="#ffffff" onchange="updateChordColor(this.value)" class="w-7 h-7 rounded-lg bg-transparent cursor-pointer border border-zinc-700">
                 </div>
-
                 <div class="flex items-center justify-between bg-zinc-900/50 px-3.5 py-3 rounded-xl border border-zinc-800">
                     <span class="font-medium">Tamaño de texto</span>
                     <select id="selectTextSize" onchange="updateTextSize(this.value)" class="bg-zinc-800 text-xs text-white rounded-lg px-2.5 py-1.5 focus:outline-none border border-zinc-700 font-semibold">
@@ -441,7 +417,6 @@
                         <option value="size-2xl">Gigante</option>
                     </select>
                 </div>
-
                 <div class="flex items-center justify-between bg-zinc-900/50 px-3.5 py-3 rounded-xl border border-zinc-800">
                     <span class="font-medium">Estilo de Letra</span>
                     <select id="selectLyricWeight" onchange="updateLyricStyleSetting(this.value)" class="bg-zinc-800 text-xs text-white rounded-lg px-2.5 py-1.5 focus:outline-none border border-zinc-700 font-semibold">
@@ -449,7 +424,6 @@
                         <option value="bold">Negrita</option>
                     </select>
                 </div>
-
                 <div class="flex items-center justify-between bg-zinc-900/50 px-3.5 py-3 rounded-xl border border-zinc-800">
                     <span class="font-medium">Estilo de Acordes</span>
                     <select id="selectChordWeight" onchange="updateChordStyleSetting(this.value)" class="bg-zinc-800 text-xs text-white rounded-lg px-2.5 py-1.5 focus:outline-none border border-zinc-700 font-semibold">
@@ -458,73 +432,132 @@
                     </select>
                 </div>
             </div>
-
             <div class="flex justify-end pt-2">
                 <button onclick="closeSettingsModal()" class="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-xs font-bold text-white transition shadow-sm">Guardar y Cerrar</button>
             </div>
         </div>
     </div>
 
-
-    <!-- ==================== MODAL DE CREACIÓN / EDICIÓN DE CANCIÓN ==================== -->
-    <div id="createModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 hidden">
-        <div class="bg-stage-card border border-stage-cardBorder rounded-2xl max-w-2xl w-full p-6 shadow-2xl flex flex-col gap-4 max-h-[90vh] overflow-y-auto">
+    <!-- MODAL DE CREACIÓN / EDICIÓN -->
+    <div id="createModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 hidden">
+        <div class="bg-stage-card border border-stage-cardBorder rounded-2xl max-w-5xl w-full p-5 md:p-6 shadow-2xl flex flex-col gap-4 max-h-[95vh] overflow-y-auto">
             <div class="flex items-center justify-between border-b border-stage-cardBorder pb-3">
                 <h3 id="modalTitle" class="text-sm font-black uppercase tracking-wider text-white">Nueva Canción</h3>
                 <button onclick="closeCreateModal()" class="text-zinc-400 hover:text-white text-lg font-bold">&times;</button>
             </div>
-
             <input type="hidden" id="editSongId">
             <input type="hidden" id="isCustomEdit" value="false">
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
-                <div>
-                    <label class="text-zinc-400 font-semibold block mb-1">Título</label>
-                    <input type="text" id="newTitle" placeholder="Ej. Glorioso Día" class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2.5 text-white focus:outline-none focus:border-indigo-500">
-                </div>
-                <div>
-                    <label class="text-zinc-400 font-semibold block mb-1">Artista / Grupo</label>
-                    <input type="text" id="newArtist" placeholder="Ej. Passion" class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2.5 text-white focus:outline-none focus:border-indigo-500">
-                </div>
-                <div>
-                    <label class="text-zinc-400 font-semibold block mb-1">Tono Original</label>
-                    <input type="text" id="newKey" placeholder="Ej. D" class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2.5 text-white focus:outline-none focus:border-indigo-500">
-                </div>
-                <div class="grid grid-cols-2 gap-2">
-                    <div>
-                        <label class="text-zinc-400 font-semibold block mb-1">BPM</label>
-                        <input type="number" id="newBpm" placeholder="118" class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2.5 text-white focus:outline-none focus:border-indigo-500">
+            <!-- CONTENEDOR PRINCIPAL EN 2 COLUMNAS -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+                
+                <!-- COLUMNA IZQUIERDA (2 APARTADOS) -->
+                <div class="lg:col-span-5 flex flex-col gap-4">
+                    
+                    <!-- APARTADO 1 SUPERIOR: SECCIONES (ABREVIATURAS LIMPIAS) -->
+                    <div class="bg-zinc-900/70 border border-zinc-800 rounded-xl p-3.5 flex flex-col gap-2">
+                        <span class="text-[10px] font-mono tracking-wider text-indigo-400 uppercase font-bold">1. Secciones de la canción</span>
+                        <div class="grid grid-cols-3 gap-1.5">
+                            <button onclick="insertSectionToken('V1')" class="py-1.5 px-2 bg-zinc-800 hover:bg-indigo-600 text-zinc-200 hover:text-white rounded-lg text-xs font-bold transition border border-zinc-700/50">V1</button>
+                            <button onclick="insertSectionToken('C')" class="py-1.5 px-2 bg-zinc-800 hover:bg-indigo-600 text-zinc-200 hover:text-white rounded-lg text-xs font-bold transition border border-zinc-700/50">C</button>
+                            <button onclick="insertSectionToken('B')" class="py-1.5 px-2 bg-zinc-800 hover:bg-indigo-600 text-zinc-200 hover:text-white rounded-lg text-xs font-bold transition border border-zinc-700/50">B</button>
+                            <button onclick="insertSectionToken('IN')" class="py-1.5 px-2 bg-zinc-800 hover:bg-indigo-600 text-zinc-200 hover:text-white rounded-lg text-xs font-bold transition border border-zinc-700/50">IN</button>
+                            <button onclick="insertSectionToken('O')" class="py-1.5 px-2 bg-zinc-800 hover:bg-indigo-600 text-zinc-200 hover:text-white rounded-lg text-xs font-bold transition border border-zinc-700/50">O</button>
+                            <button onclick="insertSectionToken('FIN')" class="py-1.5 px-2 bg-zinc-800 hover:bg-indigo-600 text-zinc-200 hover:text-white rounded-lg text-xs font-bold transition border border-zinc-700/50">FIN</button>
+                            <button onclick="insertSectionToken('INST')" class="py-1.5 px-2 bg-zinc-800 hover:bg-indigo-600 text-zinc-200 hover:text-white rounded-lg text-xs font-bold transition border border-zinc-700/50">INST</button>
+                            <button onclick="insertSectionToken('CODA')" class="py-1.5 px-2 bg-zinc-800 hover:bg-indigo-600 text-zinc-200 hover:text-white rounded-lg text-xs font-bold transition border border-zinc-700/50">CODA</button>
+                            <button onclick="insertSectionToken('P')" class="py-1.5 px-2 bg-zinc-800 hover:bg-indigo-600 text-zinc-200 hover:text-white rounded-lg text-xs font-bold transition border border-zinc-700/50">P</button>
+                        </div>
                     </div>
-                    <div>
-                        <label class="text-zinc-400 font-semibold block mb-1">Compás</label>
-                        <input type="text" id="newTimeSig" placeholder="4/4" class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2.5 text-white focus:outline-none focus:border-indigo-500">
+
+                    <!-- APARTADO 2 INFERIOR: ACORDES Y LLAVES -->
+                    <div class="bg-zinc-900/70 border border-zinc-800 rounded-xl p-3.5 flex flex-col gap-2">
+                        <div class="flex items-center justify-between">
+                            <span class="text-[10px] font-mono tracking-wider text-amber-400 uppercase font-bold">2. Acordes y Llaves</span>
+                            <span class="text-[9px] text-zinc-400">Libertad total</span>
+                        </div>
+                        <button onclick="insertChordToken('{}')" class="w-full py-1.5 bg-amber-600/20 hover:bg-amber-600/30 text-amber-300 rounded-lg text-xs font-mono font-bold transition border border-amber-500/40 text-center shadow-sm">
+                            {} (Llaves vacías)
+                        </button>
+                        <div class="grid grid-cols-4 gap-1.5 pt-1">
+                            <button onclick="insertChordToken('C')" class="py-1.5 bg-zinc-800 hover:bg-zinc-700 text-white rounded-lg text-xs font-mono font-bold transition border border-zinc-700/50">C</button>
+                            <button onclick="insertChordToken('Cm')" class="py-1.5 bg-zinc-800 hover:bg-zinc-700 text-white rounded-lg text-xs font-mono font-bold transition border border-zinc-700/50">Cm</button>
+                            <button onclick="insertChordToken('D')" class="py-1.5 bg-zinc-800 hover:bg-zinc-700 text-white rounded-lg text-xs font-mono font-bold transition border border-zinc-700/50">D</button>
+                            <button onclick="insertChordToken('Dm')" class="py-1.5 bg-zinc-800 hover:bg-zinc-700 text-white rounded-lg text-xs font-mono font-bold transition border border-zinc-700/50">Dm</button>
+                            <button onclick="insertChordToken('E')" class="py-1.5 bg-zinc-800 hover:bg-zinc-700 text-white rounded-lg text-xs font-mono font-bold transition border border-zinc-700/50">E</button>
+                            <button onclick="insertChordToken('Em')" class="py-1.5 bg-zinc-800 hover:bg-zinc-700 text-white rounded-lg text-xs font-mono font-bold transition border border-zinc-700/50">Em</button>
+                            <button onclick="insertChordToken('F')" class="py-1.5 bg-zinc-800 hover:bg-zinc-700 text-white rounded-lg text-xs font-mono font-bold transition border border-zinc-700/50">F</button>
+                            <button onclick="insertChordToken('Fm')" class="py-1.5 bg-zinc-800 hover:bg-zinc-700 text-white rounded-lg text-xs font-mono font-bold transition border border-zinc-700/50">Fm</button>
+                            <button onclick="insertChordToken('G')" class="py-1.5 bg-zinc-800 hover:bg-zinc-700 text-white rounded-lg text-xs font-mono font-bold transition border border-zinc-700/50">G</button>
+                            <button onclick="insertChordToken('Gm')" class="py-1.5 bg-zinc-800 hover:bg-zinc-700 text-white rounded-lg text-xs font-mono font-bold transition border border-zinc-700/50">Gm</button>
+                            <button onclick="insertChordToken('A')" class="py-1.5 bg-zinc-800 hover:bg-zinc-700 text-white rounded-lg text-xs font-mono font-bold transition border border-zinc-700/50">A</button>
+                            <button onclick="insertChordToken('Am')" class="py-1.5 bg-zinc-800 hover:bg-zinc-700 text-white rounded-lg text-xs font-mono font-bold transition border border-zinc-700/50">Am</button>
+                            <button onclick="insertChordToken('B')" class="py-1.5 bg-zinc-800 hover:bg-zinc-700 text-white rounded-lg text-xs font-mono font-bold transition border border-zinc-700/50">B</button>
+                            <button onclick="insertChordToken('Bm')" class="py-1.5 bg-zinc-800 hover:bg-zinc-700 text-white rounded-lg text-xs font-mono font-bold transition border border-zinc-700/50">Bm</button>
+                            <button onclick="insertChordToken('C#')" class="py-1.5 bg-zinc-800 hover:bg-zinc-700 text-white rounded-lg text-xs font-mono font-bold transition border border-zinc-700/50">C#</button>
+                            <button onclick="insertChordToken('C#m')" class="py-1.5 bg-zinc-800 hover:bg-zinc-700 text-white rounded-lg text-xs font-mono font-bold transition border border-zinc-700/50">C#m</button>
+                            <button onclick="insertChordToken('D#')" class="py-1.5 bg-zinc-800 hover:bg-zinc-700 text-white rounded-lg text-xs font-mono font-bold transition border border-zinc-700/50">D#</button>
+                            <button onclick="insertChordToken('D#m')" class="py-1.5 bg-zinc-800 hover:bg-zinc-700 text-white rounded-lg text-xs font-mono font-bold transition border border-zinc-700/50">D#m</button>
+                            <button onclick="insertChordToken('F#')" class="py-1.5 bg-zinc-800 hover:bg-zinc-700 text-white rounded-lg text-xs font-mono font-bold transition border border-zinc-700/50">F#</button>
+                            <button onclick="insertChordToken('F#m')" class="py-1.5 bg-zinc-800 hover:bg-zinc-700 text-white rounded-lg text-xs font-mono font-bold transition border border-zinc-700/50">F#m</button>
+                            <button onclick="insertChordToken('G#')" class="py-1.5 bg-zinc-800 hover:bg-zinc-700 text-white rounded-lg text-xs font-mono font-bold transition border border-zinc-700/50">G#</button>
+                            <button onclick="insertChordToken('G#m')" class="py-1.5 bg-zinc-800 hover:bg-zinc-700 text-white rounded-lg text-xs font-mono font-bold transition border border-zinc-700/50">G#m</button>
+                            <button onclick="insertChordToken('A#')" class="py-1.5 bg-zinc-800 hover:bg-zinc-700 text-white rounded-lg text-xs font-mono font-bold transition border border-zinc-700/50">A#</button>
+                            <button onclick="insertChordToken('A#m')" class="py-1.5 bg-zinc-800 hover:bg-zinc-700 text-white rounded-lg text-xs font-mono font-bold transition border border-zinc-700/50">A#m</button>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- COLUMNA DERECHA (OPCIONES Y TEXTO) -->
+                <div class="lg:col-span-7 flex flex-col gap-3">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+                        <div>
+                            <label class="text-zinc-400 font-semibold block mb-1">Título</label>
+                            <input type="text" id="newTitle" placeholder="Ej. Glorioso Día" class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-indigo-500">
+                        </div>
+                        <div>
+                            <label class="text-zinc-400 font-semibold block mb-1">Artista / Grupo</label>
+                            <input type="text" id="newArtist" placeholder="Ej. Passion" class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-indigo-500">
+                        </div>
+                        <div>
+                            <label class="text-zinc-400 font-semibold block mb-1">Tono Original</label>
+                            <input type="text" id="newKey" placeholder="Ej. D" class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-indigo-500">
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="text-zinc-400 font-semibold block mb-1">BPM</label>
+                                <input type="number" id="newBpm" placeholder="118" class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-indigo-500">
+                            </div>
+                            <div>
+                                <label class="text-zinc-400 font-semibold block mb-1">Compás</label>
+                                <input type="text" id="newTimeSig" placeholder="4/4" class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-indigo-500">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-xs flex-1 flex flex-col">
+                        <label class="text-zinc-400 font-semibold block mb-1">Contenido (Soporta {D} arriba o {D}aquí en línea)</label>
+                        <textarea id="newContent" rows="12" placeholder="{D}&#10;Aquí estás..." class="w-full flex-1 bg-zinc-900 border border-zinc-800 rounded-xl p-3 font-mono text-white focus:outline-none focus:border-indigo-500"></textarea>
                     </div>
                 </div>
+
             </div>
 
-            <div class="text-xs">
-                <label class="text-zinc-400 font-semibold block mb-1">Contenido (Usa [V1] y {Acorde})</label>
-                <textarea id="newContent" rows="10" placeholder="[V1]&#10;{D}              {A}&#10;Aquí estás, te vemos mover" class="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-3.5 font-mono text-white focus:outline-none focus:border-indigo-500"></textarea>
-            </div>
-
-            <div class="flex items-center justify-end gap-2 pt-2 text-xs">
+            <div class="flex items-center justify-end gap-2 pt-2 text-xs border-t border-stage-cardBorder">
                 <button onclick="closeCreateModal()" class="px-4 py-2.5 rounded-xl bg-zinc-800 font-bold text-zinc-300 hover:bg-zinc-700 transition">Cancelar</button>
                 <button onclick="saveSongData()" class="px-5 py-2.5 rounded-xl bg-indigo-600 font-bold text-white hover:bg-indigo-500 transition shadow-sm">Guardar Cambios</button>
             </div>
         </div>
     </div>
 
-
-    <!-- ==================== MODAL DE CREACIÓN / EDICIÓN DE EVENTO ==================== -->
+    <!-- MODAL DE EVENTO -->
     <div id="eventModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 hidden">
         <div class="bg-stage-card border border-stage-cardBorder rounded-2xl max-w-xl w-full p-6 shadow-2xl flex flex-col gap-4 max-h-[90vh] overflow-y-auto">
             <div class="flex items-center justify-between border-b border-stage-cardBorder pb-3">
                 <h3 id="eventModalTitle" class="text-sm font-black uppercase tracking-wider text-white">Nuevo Evento / Setlist</h3>
                 <button onclick="closeEventModal()" class="text-zinc-400 hover:text-white text-lg font-bold">&times;</button>
             </div>
-
             <input type="hidden" id="editEventId">
-
             <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
                 <div>
                     <label class="text-zinc-400 font-semibold block mb-1">Nombre del Evento</label>
@@ -535,19 +568,14 @@
                     <input type="text" id="eventDate" placeholder="Ej. Domingo 10:00 AM" class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2.5 text-white focus:outline-none focus:border-indigo-500">
                 </div>
             </div>
-
             <div class="text-xs">
                 <label class="text-zinc-400 font-semibold block mb-1">Notas del Evento</label>
-                <input type="text" id="eventNotes" placeholder="Ej. Llegar 30 min antes para pruebas" class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2.5 text-white focus:outline-none focus:border-indigo-500">
+                <input type="text" id="eventNotes" placeholder="Ej. Llegar 30 min antes" class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2.5 text-white focus:outline-none focus:border-indigo-500">
             </div>
-
             <div class="text-xs space-y-2">
-                <label class="text-zinc-400 font-semibold block">Seleccionar Canciones para el Setlist</label>
-                <div id="eventSongsSelector" class="bg-zinc-900 border border-zinc-800 rounded-xl p-3 max-h-48 overflow-y-auto space-y-2">
-                    <!-- Se llena dinámicamente -->
-                </div>
+                <label class="text-zinc-400 font-semibold block">Seleccionar Canciones</label>
+                <div id="eventSongsSelector" class="bg-zinc-900 border border-zinc-800 rounded-xl p-3 max-h-48 overflow-y-auto space-y-2"></div>
             </div>
-
             <div class="flex items-center justify-end gap-2 pt-2 text-xs">
                 <button onclick="closeEventModal()" class="px-4 py-2.5 rounded-xl bg-zinc-800 font-bold text-zinc-300 hover:bg-zinc-700 transition">Cancelar</button>
                 <button onclick="saveEventData()" class="px-5 py-2.5 rounded-xl bg-indigo-600 font-bold text-white hover:bg-indigo-500 transition shadow-sm">Guardar Evento</button>
@@ -560,16 +588,14 @@
         let currentUser = null;
         let globalSongs = [];
         let userCustomSongs = {}; 
-        let userEvents = {}; // Almacena eventos privados del usuario
+        let userEvents = {}; 
         let currentSong = null;
         let currentTranspose = 0;
-        let currentHomeTab = 'songs'; // 'songs' o 'events'
-        
-        // Variables para navegación en vivo de eventos
-        let activeEventPlaylist = null; // Array de IDs de canciones del evento actual
+        let currentCapo = 0;
+        let currentHomeTab = 'songs'; 
+        let activeEventPlaylist = null; 
         let activeEventIndex = 0;
 
-        // --- GESTIÓN DE AUTENTICACIÓN ---
         auth.onAuthStateChanged((user) => {
             if (user) {
                 currentUser = user;
@@ -593,48 +619,36 @@
         function loginWithEmail() {
             const email = document.getElementById('authEmail').value;
             const pass = document.getElementById('authPassword').value;
-            auth.signInWithEmailAndPassword(email, pass).catch(e => alert("Error al iniciar sesión: " + e.message));
+            auth.signInWithEmailAndPassword(email, pass).catch(e => alert("Error: " + e.message));
         }
 
         function registerWithEmail() {
             const email = document.getElementById('authEmail').value;
             const pass = document.getElementById('authPassword').value;
-            auth.createUserWithEmailAndPassword(email, pass).catch(e => alert("Error al registrarse: " + e.message));
+            auth.createUserWithEmailAndPassword(email, pass).catch(e => alert("Error: " + e.message));
         }
 
-        function logout() {
-            auth.signOut();
-        }
+        function logout() { auth.signOut(); }
 
-        // --- CARGA DE DATOS HÍBRIDA (GLOBAL + PRIVADA) ---
         function loadDataForUser() {
-            // 1. Escuchar canciones globales
             db.collection("songs").onSnapshot((snapshot) => {
                 globalSongs = [];
-                snapshot.forEach((doc) => {
-                    globalSongs.push({ id: doc.id, ...doc.data() });
-                });
+                snapshot.forEach((doc) => { globalSongs.push({ id: doc.id, ...doc.data() }); });
                 loadUserData();
             });
         }
 
         function loadUserData() {
             if (!currentUser) return;
-            // 2. Escuchar modificaciones privadas (custom_songs)
             db.collection("users").doc(currentUser.uid).collection("custom_songs").onSnapshot((snapshot) => {
                 userCustomSongs = {};
-                snapshot.forEach((doc) => {
-                    userCustomSongs[doc.id] = doc.data();
-                });
+                snapshot.forEach((doc) => { userCustomSongs[doc.id] = doc.data(); });
                 renderHomeView();
             });
 
-            // 3. Escuchar eventos del usuario (events)
             db.collection("users").doc(currentUser.uid).collection("events").onSnapshot((snapshot) => {
                 userEvents = {};
-                snapshot.forEach((doc) => {
-                    userEvents[doc.id] = { id: doc.id, ...doc.data() };
-                });
+                snapshot.forEach((doc) => { userEvents[doc.id] = { id: doc.id, ...doc.data() }; });
                 if (currentHomeTab === 'events') renderEventsView();
             });
         }
@@ -648,7 +662,6 @@
             });
         }
 
-        // --- NAVEGACIÓN ENTRE PESTAÑAS (REPERTORIO / EVENTOS) ---
         function switchHomeTab(tab) {
             currentHomeTab = tab;
             const songsBtn = document.getElementById('tabSongsBtn');
@@ -680,37 +693,27 @@
             }
         }
 
+        // PARSER DE SECCIÓN LIMPIO Y SIN DUPLICIDADES
         function parseSectionTag(rawTag) {
-            let tag = rawTag.trim().toUpperCase();
+            let clean = rawTag.trim().toUpperCase();
             let count = null;
-            
-            const countMatch = tag.match(/X\s*(\d+)/);
-            if (countMatch) {
-                count = countMatch[1];
-                tag = tag.replace(/X\s*\d+/, '').trim();
-            }
+            const countMatch = clean.match(/X\s*(\d+)/);
+            if (countMatch) { count = countMatch[1]; clean = clean.replace(/X\s*\d+/, '').trim(); }
 
             let type = 'verse';
-            let code = tag;
-            let label = 'Verso 1';
+            let code = clean;
+            let label = clean;
 
-            if (tag === 'IN' || tag.includes('INTRO')) {
-                type = 'intro'; code = 'IN'; label = 'Intro';
-            } else if (tag.startsWith('V')) {
-                type = 'verse'; const num = tag.replace('V', '') || '1'; code = 'V' + num; label = 'Verso ' + num;
-            } else if (tag === 'P' || tag.includes('PRE')) {
-                type = 'pre'; code = 'P'; label = 'Preestribillo';
-            } else if (tag.startsWith('C')) {
-                type = 'chorus'; const num = tag.replace('C', '') || '1'; code = 'C' + num; label = 'Coro ' + num;
-            } else if (tag === 'B' || tag.includes('PUENTE')) {
-                type = 'bridge'; code = 'B'; label = 'Puente';
-            } else if (tag === 'S' || tag.includes('SOLO')) {
-                type = 'solo'; code = 'S'; label = 'Solo';
-            } else if (tag === 'O' || tag.includes('OUTRO') || tag.includes('FINAL')) {
-                type = 'outro'; code = 'O'; label = 'Outro';
-            } else {
-                label = rawTag;
-            }
+            if (clean === 'IN' || clean.includes('INTRO')) { type = 'intro'; code = 'IN'; label = 'Intro'; }
+            else if (clean.startsWith('V')) { type = 'verse'; code = clean; label = 'Verso ' + clean.replace('V', ''); }
+            else if (clean === 'P' || clean.includes('PRE')) { type = 'pre'; code = 'P'; label = 'Pre-coro'; }
+            else if (clean.startsWith('C')) { type = 'chorus'; code = clean; label = clean === 'C' ? 'Coro' : 'Coro ' + clean.replace('C', ''); }
+            else if (clean === 'B' || clean.includes('PUENTE')) { type = 'bridge'; code = 'B'; label = 'Puente'; }
+            else if (clean === 'S' || clean.includes('SOLO')) { type = 'solo'; code = 'S'; label = 'Solo'; }
+            else if (clean === 'O' || clean.includes('OUTRO')) { type = 'outro'; code = 'O'; label = 'Outro'; }
+            else if (clean === 'FIN' || clean.includes('FINAL')) { type = 'outro'; code = 'FIN'; label = 'Final'; }
+            else if (clean === 'INST') { type = 'solo'; code = 'INST'; label = 'Instrumental'; }
+            else if (clean === 'CODA') { type = 'outro'; code = 'CODA'; label = 'Coda'; }
 
             return { code, label, type, count };
         }
@@ -724,9 +727,7 @@
             const onlyLyrics = localStorage.getItem('onstage_only_lyrics') === 'true';
             const toggle = document.getElementById('onlyLyricsToggle');
             if (toggle) toggle.checked = onlyLyrics;
-            if (onlyLyrics) {
-                document.getElementById('readerMainContainer').classList.add('lyrics-only');
-            }
+            if (onlyLyrics) document.getElementById('readerMainContainer').classList.add('lyrics-only');
         });
 
         function openSettingsModal() { document.getElementById('settingsModal').classList.remove('hidden'); }
@@ -734,20 +735,14 @@
 
         function updateChordStyleSetting(value) {
             const container = document.getElementById('readerMainContainer');
-            if (value === 'bold') {
-                container.classList.replace('chords-normal', 'chords-bold');
-            } else {
-                container.classList.replace('chords-bold', 'chords-normal');
-            }
+            if (value === 'bold') container.classList.replace('chords-normal', 'chords-bold');
+            else container.classList.replace('chords-bold', 'chords-normal');
         }
 
         function updateLyricStyleSetting(value) {
             const container = document.getElementById('readerMainContainer');
-            if (value === 'bold') {
-                container.classList.replace('lyrics-normal', 'lyrics-bold');
-            } else {
-                container.classList.replace('lyrics-bold', 'lyrics-normal');
-            }
+            if (value === 'bold') container.classList.replace('lyrics-normal', 'lyrics-bold');
+            else container.classList.replace('lyrics-bold', 'lyrics-normal');
         }
 
         function updateTextSize(sizeClass) {
@@ -797,9 +792,7 @@
                             let newBassIndex = (bassIndex + steps) % 12;
                             if (newBassIndex < 0) newBassIndex += 12;
                             newBass = "/" + chromaticScale[newBassIndex];
-                        } else {
-                            newBass = bass;
-                        }
+                        } else { newBass = bass; }
                     }
                     return newRoot + modifier + newBass;
                 });
@@ -828,7 +821,6 @@
             songsToDisplay.forEach(song => {
                 const card = document.createElement('div');
                 card.className = "bg-stage-card border border-stage-cardBorder rounded-2xl p-5 hover:border-indigo-500/50 transition flex flex-col justify-between gap-4 group shadow-sm";
-
                 card.innerHTML = `
                     <div class="cursor-pointer" onclick="openSongReader('${song.id}')">
                         <div class="flex items-start justify-between gap-2">
@@ -843,7 +835,6 @@
                     <div class="flex items-center justify-between border-t border-stage-cardBorder pt-3 text-xs">
                         <span class="text-zinc-500 font-mono">${song.bpm ? song.bpm + ' BPM' : 'Sin tempo'}</span>
                         <div class="flex items-center gap-2">
-                            <button onclick="openEditModal('${song.id}')" class="px-2.5 py-1 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-zinc-300 transition text-xs font-medium border border-zinc-800">Editar</button>
                             <button onclick="deleteSongAction('${song.id}', ${song.isCustomized})" class="px-2.5 py-1 rounded-lg bg-red-950/30 hover:bg-red-900/50 text-red-400 transition text-xs font-medium border border-red-900/30">Eliminar</button>
                         </div>
                     </div>
@@ -852,14 +843,13 @@
             });
         }
 
-        // --- RENDERIZADO DE VISTA DE EVENTOS ---
         function renderEventsView() {
             const grid = document.getElementById('eventListGrid');
             grid.innerHTML = '';
             const events = Object.values(userEvents);
 
             if (events.length === 0) {
-                grid.innerHTML = `<p class="text-xs text-zinc-500 col-span-full text-center py-10">No hay eventos creados todavía. Haz clic en "Nuevo Evento" para empezar.</p>`;
+                grid.innerHTML = `<p class="text-xs text-zinc-500 col-span-full text-center py-10">No hay eventos creados todavía.</p>`;
                 return;
             }
 
@@ -886,12 +876,11 @@
                             <h3 class="text-base font-bold text-white">${ev.name}</h3>
                             <span class="text-[11px] font-mono bg-indigo-950 text-indigo-400 px-2 py-0.5 rounded-lg border border-indigo-800">${ev.date || 'Sin fecha'}</span>
                         </div>
-                        <p class="text-xs text-zinc-400 mt-0.5">${ev.notes || 'Sin notas adicionales'}</p>
+                        <p class="text-xs text-zinc-400 mt-0.5">${ev.notes || 'Sin notas'}</p>
                         ${songsHtml}
                     </div>
                     <div class="flex items-center justify-between border-t border-stage-cardBorder pt-3 text-xs">
                         <button onclick="startEventPlaylist('${ev.id}')" class="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-bold transition shadow-sm flex items-center gap-1.5">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                             Iniciar Evento
                         </button>
                         <div class="flex items-center gap-2">
@@ -924,6 +913,9 @@
 
             if (floatingToolbar) floatingToolbar.classList.add('hidden');
             if (configMenu) configMenu.classList.add('hidden');
+            document.getElementById('scrollMenu').classList.add('hidden');
+            document.getElementById('keyMenu').classList.add('hidden');
+            document.getElementById('capoMenu').classList.add('hidden');
             setTool(null);
 
             if (isScrolling) toggleAutoScroll();
@@ -938,8 +930,8 @@
             if (!currentSong) return;
 
             currentTranspose = 0;
-            document.getElementById('keyDisplay').innerText = "0";
-            document.getElementById('capoSelect').value = "0";
+            currentCapo = 0;
+            document.getElementById('currentCapoBadge').innerText = "0";
 
             document.getElementById('songTitle').innerText = currentSong.title;
             document.getElementById('songArtist').innerText = currentSong.artist;
@@ -950,7 +942,6 @@
             document.getElementById('homeView').classList.add('hidden');
             document.getElementById('readerView').classList.remove('hidden');
 
-            // Si estamos en un evento activo, mostrar controles de playlist
             if (activeEventPlaylist) {
                 document.getElementById('eventPlaylistNav').classList.remove('hidden');
                 document.getElementById('eventPlaylistInfo').innerText = `${activeEventIndex + 1} / ${activeEventPlaylist.length}`;
@@ -958,12 +949,15 @@
                 document.getElementById('eventPlaylistNav').classList.add('hidden');
             }
 
+            renderKeyMenuGrid();
+            updateCurrentKeyDisplay();
             renderStructureBar();
             renderChart();
             setTimeout(resizeCanvas, 100);
         }
 
-        // --- LÓGICA DE REPRODUCCIÓN DE EVENTOS EN VIVO ---
+        function editCurrentSong() { if (currentSong) openEditModal(currentSong.id); }
+
         function startEventPlaylist(eventId) {
             const ev = userEvents[eventId];
             if (!ev || !ev.songIds || ev.songIds.length === 0) {
@@ -980,9 +974,7 @@
             if (activeEventIndex < activeEventPlaylist.length - 1) {
                 activeEventIndex++;
                 openSongReader(activeEventPlaylist[activeEventIndex]);
-            } else {
-                alert("¡Has llegado al final del evento!");
-            }
+            } else { alert("¡Has llegado al final del evento!"); }
         }
 
         function prevEventSong() {
@@ -1008,6 +1000,7 @@
             });
         }
 
+        // SOPORTE ROBUSTO PARA AMBOS FORMATOS DE ACORDES ({D} arriba o {D}en línea)
         function formatLineToHtml(lineText, isPrint = false) {
             let regex = /\{(.*?)\}/g;
             let html = '';
@@ -1019,19 +1012,15 @@
 
             while ((match = regex.exec(lineText)) !== null) {
                 if (match.index > lastIndex) {
-                    let lyricPart = lineText.substring(lastIndex, match.index);
-                    html += `<span class="lyric-item" style="${lyricStyle}">${lyricPart}</span>`;
+                    html += `<span class="lyric-item" style="${lyricStyle}">${lineText.substring(lastIndex, match.index)}</span>`;
                 }
-                let chordName = match[1].trim();
-                html += `<span class="chord-item" style="${chordStyle}">${chordName}</span>`;
+                html += `<span class="chord-item" style="${chordStyle}">${match[1].trim()}</span>`;
                 lastIndex = regex.lastIndex;
             }
 
             if (lastIndex < lineText.length) {
-                let remainingText = lineText.substring(lastIndex);
-                html += `<span class="lyric-item" style="${lyricStyle}">${remainingText}</span>`;
+                html += `<span class="lyric-item" style="${lyricStyle}">${lineText.substring(lastIndex)}</span>`;
             }
-
             return html;
         }
 
@@ -1040,8 +1029,7 @@
             container.innerHTML = '';
             if (!currentSong.sections) return;
 
-            const capo = parseInt(document.getElementById('capoSelect').value) || 0;
-            const netTranspose = currentTranspose - capo;
+            const netTranspose = currentTranspose - currentCapo;
 
             currentSong.sections.forEach(sec => {
                 const card = document.createElement('div');
@@ -1076,9 +1064,7 @@
             if (!currentSong) return;
             const sheet = document.getElementById('printSheetContainer');
             sheet.innerHTML = '';
-
-            const capo = parseInt(document.getElementById('capoSelect').value) || 0;
-            const netTranspose = currentTranspose - capo;
+            const netTranspose = currentTranspose - currentCapo;
             const onlyLyrics = document.getElementById('onlyLyricsToggle').checked;
 
             let html = `
@@ -1088,7 +1074,7 @@
                         <p class="text-xs font-bold text-zinc-600 uppercase tracking-wider">${currentSong.artist}</p>
                     </div>
                     <div class="text-[11px] font-bold text-zinc-700 bg-zinc-100 px-3 py-1 rounded-xl border border-zinc-200">
-                        Tono: ${currentSong.originalKey} ${currentTranspose !== 0 ? '(' + (currentTranspose > 0 ? '+' + currentTranspose : currentTranspose) + ')' : ''} | Capo: ${capo} | ${currentSong.bpm || '--'} BPM
+                        Tono: ${currentSong.originalKey} | Capo: ${currentCapo} | ${currentSong.bpm || '--'} BPM
                     </div>
                 </div>
                 <div class="space-y-4">
@@ -1098,164 +1084,199 @@
                 html += `
                     <div class="bg-white border border-zinc-200 rounded-xl p-3.5 shadow-sm">
                         <div class="text-[10px] font-black text-black uppercase bg-zinc-100 px-2.5 py-1 rounded-lg inline-block mb-2 border border-zinc-200">
-                            ${sec.code} - ${sec.label} ${sec.count ? '(× ' + sec.count + ')' : ''}
+                            ${sec.code} - ${sec.label}
                         </div>
                         <div class="space-y-1">
                 `;
-
                 sec.lines.forEach(lineText => {
                     const transposedLine = transposeChordLine(lineText, netTranspose);
                     const formattedHtml = formatLineToHtml(transposedLine, true);
                     if (!onlyLyrics || !transposedLine.includes('{')) {
-                        html += `<div class="chord-lyric-block text-sm" style="white-space: pre;">${formattedHtml}</div>`;
+                        html += `<div class="chord-lyric-block text-sm" style="white-space: pre-wrap;">${formattedHtml}</div>`;
                     }
                 });
-
                 html += `</div></div>`;
             });
-
             html += `</div>`;
             sheet.innerHTML = html;
             document.getElementById('printPreviewModal').classList.remove('hidden');
         }
 
-        function closePrintPreview() {
-            document.getElementById('printPreviewModal').classList.add('hidden');
-        }
+        function closePrintPreview() { document.getElementById('printPreviewModal').classList.add('hidden'); }
 
         function downloadPDF() {
             if (!currentSong) return;
             const element = document.getElementById('printSheetContainer');
-            const filename = `${currentSong.title.replace(/\s+/g, '_')}_Chords.pdf`;
-
-            const opt = {
-                margin: [10, 10, 10, 10],
-                filename: filename,
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2, useCORS: true, logging: false },
-                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-            };
-
-            html2pdf().set(opt).from(element).save();
+            html2pdf().set({ margin: [10, 10, 10, 10], filename: `${currentSong.title}.pdf`, html2canvas: { scale: 2 } }).from(element).save();
         }
 
         function downloadImage2D() {
             if (!currentSong) return;
-
-            const capo = parseInt(document.getElementById('capoSelect').value) || 0;
-            const netTranspose = currentTranspose - capo;
+            const netTranspose = currentTranspose - currentCapo;
             const onlyLyrics = document.getElementById('onlyLyricsToggle').checked;
-
             const canvas = document.createElement('canvas');
-            canvas.width = 1200;
-            canvas.height = 1600;
+            canvas.width = 1200; canvas.height = 1600;
             const ctx = canvas.getContext('2d');
-
-            ctx.fillStyle = '#FFFFFF';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-            ctx.strokeStyle = '#CBD5E1';
-            ctx.lineWidth = 4;
-            ctx.strokeRect(40, 40, canvas.width - 80, canvas.height - 80);
-
-            ctx.fillStyle = '#0F172A';
-            ctx.font = 'bold 38px monospace';
-            ctx.fillText(currentSong.title, 80, 110);
-
-            ctx.fillStyle = '#64748B';
-            ctx.font = 'bold 22px monospace';
-            ctx.fillText(currentSong.artist, 80, 145);
-
-            ctx.textAlign = 'right';
-            ctx.fillStyle = '#1E293B';
-            ctx.font = 'bold 20px monospace';
-            const infoMeta = `Tono: ${currentSong.originalKey} | Capo: ${capo} | BPM: ${currentSong.bpm || '--'}`;
-            ctx.fillText(infoMeta, canvas.width - 80, 120);
-            ctx.textAlign = 'left';
-
-            ctx.strokeStyle = '#0F172A';
-            ctx.lineWidth = 3;
-            ctx.beginPath();
-            ctx.moveTo(80, 175);
-            ctx.lineTo(canvas.width - 80, 175);
-            ctx.stroke();
-
+            ctx.fillStyle = '#FFFFFF'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.fillStyle = '#0F172A'; ctx.font = 'bold 38px monospace'; ctx.fillText(currentSong.title, 80, 110);
+            ctx.fillStyle = '#64748B'; ctx.font = 'bold 22px monospace'; ctx.fillText(currentSong.artist, 80, 145);
             let cursorY = 220;
 
             currentSong.sections.forEach(sec => {
-                if (cursorY > canvas.height - 120) return;
-
-                ctx.fillStyle = '#F1F5F9';
-                ctx.fillRect(80, cursorY - 24, 220, 36);
-                ctx.strokeStyle = '#CBD5E1';
-                ctx.lineWidth = 1;
-                ctx.strokeRect(80, cursorY - 24, 220, 36);
-
-                ctx.fillStyle = '#0F172A';
-                ctx.font = 'bold 18px monospace';
-                const tagLabel = `${sec.code} - ${sec.label} ${sec.count ? '(x' + sec.count + ')' : ''}`;
-                ctx.fillText(tagLabel, 95, cursorY);
-                cursorY += 45;
-
+                ctx.fillStyle = '#0F172A'; ctx.font = 'bold 18px monospace';
+                ctx.fillText(`${sec.code} - ${sec.label}`, 95, cursorY);
+                cursorY += 40;
                 sec.lines.forEach(lineText => {
-                    if (cursorY > canvas.height - 100) return;
-
                     const transposedLine = transposeChordLine(lineText, netTranspose);
-
                     if (!onlyLyrics || !transposedLine.includes('{')) {
-                        let cleanLine = transposedLine.replace(/\{(.*?)\}/g, '$1');
-                        ctx.fillStyle = '#000000';
-                        ctx.font = transposedLine.includes('{') ? '900 20px monospace' : 'normal 20px monospace';
-                        ctx.fillText(cleanLine, 95, cursorY);
-                        cursorY += 32;
+                        ctx.fillText(transposedLine.replace(/\{(.*?)\}/g, '$1'), 95, cursorY);
+                        cursorY += 30;
                     }
                 });
-
                 cursorY += 20;
             });
 
-            ctx.strokeStyle = '#CBD5E1';
-            ctx.beginPath();
-            ctx.moveTo(80, canvas.height - 90);
-            ctx.lineTo(canvas.width - 80, canvas.height - 90);
-            ctx.stroke();
-
-            ctx.fillStyle = '#64748B';
-            ctx.font = '16px monospace';
-            ctx.fillText('Setlist Atril Virtual', 80, canvas.height - 55);
-
-            const nombreArchivo = `${currentSong.title.replace(/\s+/g, '_')}_Chords.png`;
-            canvas.toBlob((blob) => {
-                if (!blob) return;
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = nombreArchivo;
-                document.body.appendChild(a);
-                a.click();
-                setTimeout(() => {
-                    document.body.removeChild(a);
-                    URL.revokeObjectURL(url);
-                }, 300);
-            }, 'image/png');
+            const a = document.createElement('a');
+            a.href = canvas.toDataURL('image/png');
+            a.download = `${currentSong.title}.png`;
+            a.click();
         }
 
-        function changeKey(delta) {
-            currentTranspose += delta;
-            document.getElementById('keyDisplay').innerText = (currentTranspose > 0 ? `+${currentTranspose}` : currentTranspose);
+        function getCalculatedKey(origKeyStr, transposeSteps) {
+            if (!origKeyStr) return "C";
+            let cleanRoot = origKeyStr.trim().split('/')[0].replace(/m|maj|min|aug|dim|sus\d*|\d*/g, '');
+            let normalized = flatToSharp[cleanRoot] || cleanRoot;
+            let idx = chromaticScale.indexOf(normalized);
+            if (idx === -1) idx = 0;
+            let newIdx = (idx + transposeSteps) % 12;
+            if (newIdx < 0) newIdx += 12;
+            return chromaticScale[newIdx] + origKeyStr.trim().substring(cleanRoot.length);
+        }
+
+        function updateCurrentKeyDisplay() {
+            if (!currentSong) return;
+            const badge = document.getElementById('currentKeyBadge');
+            badge.innerText = getCalculatedKey(currentSong.originalKey, currentTranspose);
+            badge.className = currentTranspose !== 0 ? "font-mono font-bold text-amber-400" : "font-mono font-bold text-indigo-400";
+        }
+
+        function toggleKeyMenu(e) {
+            e.stopPropagation();
+            document.getElementById('keyMenu').classList.toggle('hidden');
+            document.getElementById('capoMenu').classList.add('hidden');
+            document.getElementById('scrollMenu').classList.add('hidden');
+        }
+
+        function toggleCapoMenu(e) {
+            e.stopPropagation();
+            document.getElementById('capoMenu').classList.toggle('hidden');
+            document.getElementById('keyMenu').classList.add('hidden');
+            document.getElementById('scrollMenu').classList.add('hidden');
+        }
+
+        function toggleScrollMenu(e) {
+            e.stopPropagation();
+            document.getElementById('scrollMenu').classList.toggle('hidden');
+            document.getElementById('keyMenu').classList.add('hidden');
+            document.getElementById('capoMenu').classList.add('hidden');
+        }
+
+        function setCapoValue(val) {
+            currentCapo = val;
+            document.getElementById('currentCapoBadge').innerText = val;
+            document.getElementById('capoMenu').classList.add('hidden');
             renderChart();
         }
 
-        function updateView() { renderChart(); }
+        function renderKeyMenuGrid() {
+            if (!currentSong) return;
+            const grid = document.getElementById('keyNotesGrid');
+            grid.innerHTML = '';
+            document.getElementById('origKeyInfo').innerText = `Orig: ${currentSong.originalKey}`;
+
+            let origCleanRoot = currentSong.originalKey.trim().split('/')[0].replace(/m|maj|min|aug|dim|sus\d*|\d*/g, '');
+            let origIndex = chromaticScale.indexOf(flatToSharp[origCleanRoot] || origCleanRoot);
+            if (origIndex === -1) origIndex = 0;
+
+            chromaticScale.forEach((note, index) => {
+                const btn = document.createElement('button');
+                const steps = index - origIndex;
+                const isSelected = (currentTranspose % 12 + 12) % 12 === (steps % 12 + 12) % 12;
+                btn.className = `py-1.5 text-xs font-mono font-bold rounded-lg border transition ${isSelected ? 'bg-indigo-600 text-white border-indigo-500 shadow-sm' : 'bg-zinc-900/90 text-zinc-300 hover:text-white hover:bg-zinc-800 border-zinc-800'}`;
+                btn.innerText = note;
+                btn.onclick = () => selectKeyByNoteSteps(steps);
+                grid.appendChild(btn);
+            });
+        }
+
+        function selectKeyByNoteSteps(steps) {
+            currentTranspose = steps;
+            updateCurrentKeyDisplay();
+            renderKeyMenuGrid();
+            renderChart();
+            document.getElementById('keyMenu').classList.add('hidden');
+        }
+
+        function resetKeyToOriginal() {
+            currentTranspose = 0;
+            updateCurrentKeyDisplay();
+            renderKeyMenuGrid();
+            renderChart();
+            document.getElementById('keyMenu').classList.add('hidden');
+        }
+
+        window.addEventListener('click', () => {
+            document.getElementById('keyMenu').classList.add('hidden');
+            document.getElementById('capoMenu').classList.add('hidden');
+            document.getElementById('scrollMenu').classList.add('hidden');
+        });
+
+        document.getElementById('keyMenu').addEventListener('click', (e) => e.stopPropagation());
+        document.getElementById('capoMenu').addEventListener('click', (e) => e.stopPropagation());
+        document.getElementById('scrollMenu').addEventListener('click', (e) => e.stopPropagation());
 
         function scrollToSection(id) {
             const el = document.getElementById(id);
             if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
-        // --- MODAL DE CANCIONES ---
+        function insertSectionToken(sectionAbbr) {
+            const textarea = document.getElementById('newContent');
+            const start = textarea.selectionStart;
+            const end = textarea.selectionEnd;
+            const text = textarea.value;
+            
+            let tagText = `[${sectionAbbr}]\n`;
+            textarea.value = text.substring(0, start) + tagText + text.substring(end);
+            textarea.focus();
+            textarea.selectionStart = textarea.selectionEnd = start + tagText.length;
+        }
+
+        function insertChordToken(chord) {
+            const textarea = document.getElementById('newContent');
+            const start = textarea.selectionStart;
+            const end = textarea.selectionEnd;
+            const text = textarea.value;
+            
+            let insertion = "";
+            let cursorOffset = 0;
+
+            if (chord === '{}') {
+                insertion = "{}";
+                cursorOffset = 1;
+            } else {
+                insertion = `{${chord}}`;
+                cursorOffset = insertion.length;
+            }
+
+            textarea.value = text.substring(0, start) + insertion + text.substring(end);
+            textarea.focus();
+            textarea.selectionStart = textarea.selectionEnd = start + cursorOffset;
+        }
+
         function openCreateModal() {
-            document.getElementById('modalTitle').innerText = "Nueva Canción (Global)";
+            document.getElementById('modalTitle').innerText = "Nueva Canción";
             document.getElementById('editSongId').value = "";
             document.getElementById('isCustomEdit').value = "false";
             document.getElementById('newTitle').value = "";
@@ -1268,11 +1289,9 @@
         }
 
         function openEditModal(songId) {
-            const songsToDisplay = getEffectiveSongs();
-            const song = songsToDisplay.find(s => s.id === songId);
+            const song = getEffectiveSongs().find(s => s.id === songId);
             if (!song) return;
-
-            document.getElementById('modalTitle').innerText = song.isCustomized ? "Editar Versión Personal" : "Personalizar Canción Global";
+            document.getElementById('modalTitle').innerText = "Editar Canción";
             document.getElementById('editSongId').value = song.id;
             document.getElementById('isCustomEdit').value = "true";
             document.getElementById('newTitle').value = song.title;
@@ -1284,9 +1303,7 @@
             let rawContent = "";
             song.sections.forEach(sec => {
                 rawContent += `[${sec.code}${sec.count ? ' x' + sec.count : ''}]\n`;
-                sec.lines.forEach(lineText => {
-                    rawContent += lineText + "\n";
-                });
+                sec.lines.forEach(line => { rawContent += line + "\n"; });
                 rawContent += "\n";
             });
             document.getElementById('newContent').value = rawContent.trim();
@@ -1295,13 +1312,11 @@
 
         function closeCreateModal() { document.getElementById('createModal').classList.add('hidden'); }
 
-        // --- MODAL DE EVENTOS (Corregido) ---
         function openEventModal(eventId = null) {
             document.getElementById('editEventId').value = eventId || "";
             const nameInput = document.getElementById('eventName');
             const dateInput = document.getElementById('eventDate');
             const notesInput = document.getElementById('eventNotes');
-            
             let selectedSongIds = [];
 
             if (eventId && userEvents[eventId]) {
@@ -1312,32 +1327,21 @@
                 notesInput.value = ev.notes || "";
                 selectedSongIds = ev.songIds || [];
             } else {
-                document.getElementById('eventModalTitle').innerText = "Nuevo Evento / Setlist";
-                nameInput.value = "";
-                dateInput.value = "";
-                notesInput.value = "";
+                document.getElementById('eventModalTitle').innerText = "Nuevo Evento";
+                nameInput.value = ""; dateInput.value = ""; notesInput.value = "";
             }
 
-            // Renderizar checklist de canciones disponibles
-            const selectorContainer = document.getElementById('eventSongsSelector');
-            selectorContainer.innerHTML = '';
-            const allSongs = getEffectiveSongs();
-
-            if (allSongs.length === 0) {
-                selectorContainer.innerHTML = `<p class="text-zinc-500 italic text-[11px]">No hay canciones en el repertorio.</p>`;
-            } else {
-                allSongs.forEach(song => {
-                    const isChecked = selectedSongIds.includes(song.id) ? 'checked' : '';
-                    selectorContainer.innerHTML += `
-                        <label class="flex items-center gap-2 cursor-pointer hover:bg-zinc-800/50 p-1.5 rounded-lg transition">
-                            <input type="checkbox" value="${song.id}" ${isChecked} class="event-song-checkbox rounded bg-zinc-900 border-zinc-700 text-indigo-600 focus:ring-0">
-                            <span class="text-white font-medium">${song.title}</span>
-                            <span class="text-zinc-500 text-[10px]">(${song.artist})</span>
-                        </label>
-                    `;
-                });
-            }
-
+            const selector = document.getElementById('eventSongsSelector');
+            selector.innerHTML = '';
+            getEffectiveSongs().forEach(song => {
+                const isChecked = selectedSongIds.includes(song.id) ? 'checked' : '';
+                selector.innerHTML += `
+                    <label class="flex items-center gap-2 cursor-pointer hover:bg-zinc-800/50 p-1.5 rounded-lg transition">
+                        <input type="checkbox" value="${song.id}" ${isChecked} class="event-song-checkbox rounded bg-zinc-900 border-zinc-700 text-indigo-600 focus:ring-0">
+                        <span class="text-white font-medium">${song.title}</span>
+                    </label>
+                `;
+            });
             document.getElementById('eventModal').classList.remove('hidden');
         }
 
@@ -1348,56 +1352,26 @@
             const name = document.getElementById('eventName').value.trim();
             const date = document.getElementById('eventDate').value.trim();
             const notes = document.getElementById('eventNotes').value.trim();
-
-            if (!name) {
-                alert("Por favor ingresa un nombre para el evento.");
-                return;
-            }
-
-            const checkboxes = document.querySelectorAll('.event-song-checkbox:checked');
-            const songIds = Array.from(checkboxes).map(cb => cb.value);
-
-            const eventData = { name, date, notes, songIds };
+            if (!name) { alert("Ingresa un nombre"); return; }
+            const songIds = Array.from(document.querySelectorAll('.event-song-checkbox:checked')).map(cb => cb.value);
 
             try {
-                if (editId) {
-                    await db.collection("users").doc(currentUser.uid).collection("events").doc(editId).set(eventData);
-                } else {
-                    await db.collection("users").doc(currentUser.uid).collection("events").add(eventData);
-                }
+                const data = { name, date, notes, songIds };
+                if (editId) await db.collection("users").doc(currentUser.uid).collection("events").doc(editId).set(data);
+                else await db.collection("users").doc(currentUser.uid).collection("events").add(data);
                 closeEventModal();
-            } catch (e) {
-                alert("Error al guardar el evento: " + e.message);
-            }
+            } catch (e) { alert("Error: " + e.message); }
         }
 
         async function deleteEventAction(eventId) {
-            if (confirm("¿Estás seguro de eliminar este evento?")) {
-                try {
-                    await db.collection("users").doc(currentUser.uid).collection("events").doc(eventId).delete();
-                } catch (e) {
-                    alert("Error al eliminar evento: " + e.message);
-                }
-            }
+            if (confirm("¿Eliminar evento?")) await db.collection("users").doc(currentUser.uid).collection("events").doc(eventId).delete();
         }
 
         async function deleteSongAction(songId, isCustomized) {
             if (isCustomized) {
-                if (confirm("¿Deseas eliminar tu versión personalizada y volver a la canción global original?")) {
-                    try {
-                        await db.collection("users").doc(currentUser.uid).collection("custom_songs").doc(songId).delete();
-                    } catch (e) {
-                        alert("Error al eliminar versión personal: " + e.message);
-                    }
-                }
+                if (confirm("¿Eliminar versión personal?")) await db.collection("users").doc(currentUser.uid).collection("custom_songs").doc(songId).delete();
             } else {
-                if (confirm("¿Estás seguro de eliminar esta canción global de la nube para todos?")) {
-                    try {
-                        await db.collection("songs").doc(songId).delete();
-                    } catch (e) {
-                        alert("Error al eliminar canción global: " + e.message);
-                    }
-                }
+                if (confirm("¿Eliminar canción global?")) await db.collection("songs").doc(songId).delete();
             }
         }
 
@@ -1409,23 +1383,14 @@
             lines.forEach((line, idx) => {
                 const trimmed = line.trim();
                 const match = trimmed.match(/^\[(.*?)\]/);
-                
                 if (match && !trimmed.includes(' ')) {
                     if (currentSec.lines.length > 0) sections.push(currentSec);
                     const parsed = parseSectionTag(match[1]);
-                    currentSec = {
-                        id: `sec-${Date.now()}-${idx}`,
-                        ...parsed,
-                        lines: []
-                    };
+                    currentSec = { id: `sec-${Date.now()}-${idx}`, ...parsed, lines: [] };
                     return;
                 }
-
-                if (trimmed !== "") {
-                    currentSec.lines.push(line);
-                }
+                if (trimmed !== "") currentSec.lines.push(line);
             });
-
             if (currentSec.lines.length > 0) sections.push(currentSec);
             return sections;
         }
@@ -1440,178 +1405,112 @@
             const timeSig = document.getElementById('newTimeSig').value.trim() || '4/4';
             const content = document.getElementById('newContent').value;
 
-            if (!title || !artist) {
-                alert("Por favor completa al menos Título y Artista.");
-                return;
-            }
-
-            const parsedSections = parseChordProInput(content);
-
-            const songData = {
-                title,
-                artist,
-                originalKey: key || 'C',
-                bpm,
-                timeSig,
-                sections: parsedSections.length > 0 ? parsedSections : [
-                    { id: "sec-in", ...parseSectionTag("IN"), lines: [content] }
-                ]
-            };
+            if (!title || !artist) { alert("Título y Artista requeridos"); return; }
+            const songData = { title, artist, originalKey: key || 'C', bpm, timeSig, sections: parseChordProInput(content) };
 
             try {
-                if (editId && isCustomEdit) {
-                    await db.collection("users").doc(currentUser.uid).collection("custom_songs").doc(editId).set(songData);
-                } else if (editId) {
-                    await db.collection("songs").doc(editId).update(songData);
-                } else {
-                    await db.collection("songs").add(songData);
-                }
+                if (editId && isCustomEdit) await db.collection("users").doc(currentUser.uid).collection("custom_songs").doc(editId).set(songData);
+                else if (editId) await db.collection("songs").doc(editId).update(songData);
+                else await db.collection("songs").add(songData);
                 closeCreateModal();
-            } catch (e) {
-                alert("Error al guardar en la nube: " + e.message);
+                if (currentSong && currentSong.id === editId) openSongReader(editId);
+            } catch (e) { alert("Error: " + e.message); }
+        }
+
+        // --- SCROLL AUTOMÁTICO ---
+        let autoScrollInterval = null;
+        let isScrolling = false;
+        let currentScrollSpeed = 2;
+
+        function changeScrollSpeed(val) {
+            currentScrollSpeed = parseInt(val);
+            if (isScrolling) {
+                clearInterval(autoScrollInterval);
+                startScrollInterval();
             }
         }
 
-        // --- AUTO SCROLL ---
-        let autoScrollInterval = null;
-        let isScrolling = false;
+        function startScrollInterval() {
+            if (currentScrollSpeed === 0) return;
+            const intervalTime = Math.max(15, 100 - (currentScrollSpeed * 15));
+            autoScrollInterval = setInterval(() => {
+                window.scrollBy(0, 1);
+                if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 5) {
+                    toggleAutoScroll();
+                }
+            }, intervalTime);
+        }
 
         function toggleAutoScroll() {
-            const btn = document.getElementById('scrollToggleBtn');
-            const btnText = document.getElementById('scrollBtnText');
+            const playBtn = document.getElementById('scrollPlayBtn');
+            const playIcon = document.getElementById('scrollPlayIcon');
+            
             if (isScrolling) {
                 clearInterval(autoScrollInterval);
                 isScrolling = false;
-                btnText.innerText = "Scroll";
-                btn.classList.remove('bg-red-600', 'hover:bg-red-500');
-                btn.classList.add('bg-indigo-600', 'hover:bg-indigo-500');
+                playIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path>`;
+                playBtn.className = "flex items-center justify-center p-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white transition shadow-sm";
             } else {
+                if (currentScrollSpeed === 0) {
+                    currentScrollSpeed = 2;
+                    document.getElementById('scrollSpeedSelect').value = "2";
+                }
                 isScrolling = true;
-                btnText.innerText = "Pausar";
-                btn.classList.remove('bg-indigo-600', 'hover:bg-indigo-500');
-                btn.classList.add('bg-red-600', 'hover:bg-red-500');
-                autoScrollInterval = setInterval(() => {
-                    window.scrollBy({ top: 1, behavior: 'smooth' });
-                    if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 5) toggleAutoScroll();
-                }, 100);
+                playIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>`;
+                playBtn.className = "flex items-center justify-center p-2 rounded-xl bg-red-600 hover:bg-red-500 text-white transition shadow-sm";
+                startScrollInterval();
             }
         }
 
-        // ==================== LÓGICA DE DIBUJO Y ANOTACIONES ====================
+        // --- LÓGICA DE DIBUJO ---
         const container = document.getElementById('readerMainContainer');
         const canvas = document.getElementById('annotationCanvas');
         const ctx = canvas.getContext('2d');
-
-        // Buffer principal (persistente)
         const mainBufferCanvas = document.createElement('canvas');
         const mainBufferCtx = mainBufferCanvas.getContext('2d');
-
-        // Buffer del trazo activo (resaltador translúcido)
         const currentStrokeCanvas = document.createElement('canvas');
         const currentStrokeCtx = currentStrokeCanvas.getContext('2d');
 
         const btnToggleToolbar = document.getElementById('btnToggleToolbar');
         const floatingToolbar = document.getElementById('floatingToolbar');
         const modeStatus = document.getElementById('modeStatus');
+        const toolPen = document.getElementById('toolPen'), toolHighlighter = document.getElementById('toolHighlighter'), toolText = document.getElementById('toolText'), toolEraser = document.getElementById('toolEraser');
+        const btnColorPicker = document.getElementById('btnColorPicker'), btnSizeDisplay = document.getElementById('btnSizeDisplay'), sizeLabel = document.getElementById('sizeLabel');
+        const configMenu = document.getElementById('configMenu'), sizeSlider = document.getElementById('sizeSlider'), sliderVal = document.getElementById('sliderVal'), sliderTitle = document.getElementById('sliderTitle'), btnClearAll = document.getElementById('btnClearAll');
 
-        const toolPen = document.getElementById('toolPen');
-        const toolHighlighter = document.getElementById('toolHighlighter');
-        const toolText = document.getElementById('toolText');
-        const toolEraser = document.getElementById('toolEraser');
-
-        const btnColorPicker = document.getElementById('btnColorPicker');
-        const btnSizeDisplay = document.getElementById('btnSizeDisplay');
-        const sizeLabel = document.getElementById('sizeLabel');
-        const configMenu = document.getElementById('configMenu');
-        const sizeSlider = document.getElementById('sizeSlider');
-        const sliderVal = document.getElementById('sliderVal');
-        const sliderTitle = document.getElementById('sliderTitle');
-        const btnClearAll = document.getElementById('btnClearAll');
-
-        let activeTool = null; // null = Modo Lectura
-        let isDrawing = false;
-        let currentColor = '#facc15';
-        let penSize = 3;
-        let fontSize = 18;
-        let strokePoints = [];
+        let activeTool = null, isDrawing = false, currentColor = '#facc15', penSize = 3, fontSize = 18, strokePoints = [];
 
         function resizeCanvas() {
             if (!container) return;
-            const w = container.offsetWidth;
-            const h = container.offsetHeight;
-
+            const w = container.offsetWidth, h = container.offsetHeight;
             const tempSaved = document.createElement('canvas');
-            tempSaved.width = mainBufferCanvas.width || w;
-            tempSaved.height = mainBufferCanvas.height || h;
+            tempSaved.width = mainBufferCanvas.width || w; tempSaved.height = mainBufferCanvas.height || h;
             tempSaved.getContext('2d').drawImage(mainBufferCanvas, 0, 0);
 
-            canvas.width = w;
-            canvas.height = h;
-            mainBufferCanvas.width = w;
-            mainBufferCanvas.height = h;
-            currentStrokeCanvas.width = w;
-            currentStrokeCanvas.height = h;
-
+            canvas.width = w; canvas.height = h;
+            mainBufferCanvas.width = w; mainBufferCanvas.height = h;
+            currentStrokeCanvas.width = w; currentStrokeCanvas.height = h;
             mainBufferCtx.drawImage(tempSaved, 0, 0);
-            renderCanvas();
+            ctx.clearRect(0, 0, w, h); ctx.drawImage(mainBufferCanvas, 0, 0);
         }
         window.addEventListener('resize', resizeCanvas);
 
-        function renderCanvas() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.drawImage(mainBufferCanvas, 0, 0);
-        }
-
         btnToggleToolbar.addEventListener('click', () => {
             floatingToolbar.classList.toggle('hidden');
-            if (floatingToolbar.classList.contains('hidden')) {
-                configMenu.classList.add('hidden');
-                setTool(null);
-            }
+            if (floatingToolbar.classList.contains('hidden')) { configMenu.classList.add('hidden'); setTool(null); }
         });
 
         function setTool(tool) {
-            if (activeTool === tool) {
-                activeTool = null;
-            } else {
-                activeTool = tool;
-            }
-
+            activeTool = (activeTool === tool) ? null : tool;
             [toolPen, toolHighlighter, toolText, toolEraser].forEach(b => {
                 b.classList.remove('bg-indigo-500/20', 'text-indigo-400', 'border', 'border-indigo-500/40');
                 b.classList.add('text-gray-400', 'hover:text-white');
             });
-
             if (activeTool) {
                 const btnMap = { pen: toolPen, highlighter: toolHighlighter, text: toolText, eraser: toolEraser };
                 btnMap[activeTool].classList.add('bg-indigo-500/20', 'text-indigo-400', 'border', 'border-indigo-500/40');
-                btnMap[activeTool].classList.remove('text-gray-400', 'hover:text-white');
-                
                 canvas.classList.remove('pointer-events-none');
                 modeStatus.innerHTML = `ESTADO: <strong class="text-indigo-400 font-medium">${activeTool.toUpperCase()}</strong>`;
-                
-                if (activeTool === 'text') {
-                    sliderTitle.innerText = 'Tamaño Texto';
-                    sizeSlider.min = 12;
-                    sizeSlider.max = 60;
-                    sizeSlider.value = fontSize;
-                    sizeLabel.innerText = `${fontSize}px`;
-                    sliderVal.innerText = `${fontSize} pt`;
-                } else if (activeTool === 'highlighter') {
-                    sliderTitle.innerText = 'Grosor Resaltador';
-                    sizeSlider.min = 10;
-                    sizeSlider.max = 50;
-                    sizeSlider.value = penSize * 4;
-                    sizeLabel.innerText = `${penSize * 4}px`;
-                    sliderVal.innerText = `${penSize * 4} pt`;
-                } else {
-                    sliderTitle.innerText = 'Grosor Trazo';
-                    sizeSlider.min = 1;
-                    sizeSlider.max = 40;
-                    sizeSlider.value = penSize;
-                    sizeLabel.innerText = `${penSize}px`;
-                    sliderVal.innerText = `${penSize} pt`;
-                }
             } else {
                 canvas.classList.add('pointer-events-none');
                 modeStatus.innerHTML = 'ESTADO: <strong class="text-emerald-400 font-medium">LECTURA</strong>';
@@ -1623,11 +1522,8 @@
         toolHighlighter.addEventListener('click', () => setTool('highlighter'));
         toolText.addEventListener('click', () => setTool('text'));
         toolEraser.addEventListener('click', () => setTool('eraser'));
-
         btnColorPicker.addEventListener('click', (e) => { e.stopPropagation(); configMenu.classList.toggle('hidden'); });
         btnSizeDisplay.addEventListener('click', (e) => { e.stopPropagation(); configMenu.classList.toggle('hidden'); });
-        window.addEventListener('click', () => configMenu.classList.add('hidden'));
-        configMenu.addEventListener('click', (e) => e.stopPropagation());
 
         document.querySelectorAll('.color-option').forEach(btn => {
             btn.addEventListener('click', (e) => {
@@ -1639,77 +1535,58 @@
 
         sizeSlider.addEventListener('input', (e) => {
             const val = parseInt(e.target.value);
-            if (activeTool === 'text') {
-                fontSize = val;
-            } else {
-                penSize = val;
-            }
-            sizeLabel.innerText = `${val}px`;
-            sliderVal.innerText = `${val} pt`;
+            if (activeTool === 'text') fontSize = val; else penSize = val;
+            sizeLabel.innerText = `${val}px`; sliderVal.innerText = `${val} pt`;
         });
 
         btnClearAll.addEventListener('click', () => {
             if (confirm('¿Limpiar anotaciones?')) {
                 mainBufferCtx.clearRect(0, 0, mainBufferCanvas.width, mainBufferCanvas.height);
-                renderCanvas();
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
                 document.querySelectorAll('.user-text-input').forEach(el => el.remove());
             }
         });
 
         container.addEventListener('click', (e) => {
             if (activeTool !== 'text') return;
-
             const rect = container.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-
             const input = document.createElement('input');
             input.type = 'text';
-            input.className = 'user-text-input absolute outline-none font-sans font-bold z-40 transition-all';
-            input.style.left = `${x}px`;
-            input.style.top = `${y}px`;
-            input.style.color = currentColor;
-            input.style.fontSize = `${fontSize}px`;
-
+            input.className = 'user-text-input absolute outline-none font-sans font-bold z-40';
+            input.style.left = `${e.clientX - rect.left}px`;
+            input.style.top = `${e.clientY - rect.top}px`;
+            input.style.color = currentColor; input.style.fontSize = `${fontSize}px`;
             container.appendChild(input);
             setTimeout(() => input.focus(), 50);
 
             input.addEventListener('blur', () => {
                 if (input.value.trim() !== '') {
                     mainBufferCtx.save();
-                    mainBufferCtx.globalCompositeOperation = 'source-over';
-                    mainBufferCtx.globalAlpha = 1.0;
                     mainBufferCtx.font = `bold ${fontSize}px sans-serif`;
                     mainBufferCtx.fillStyle = currentColor;
                     mainBufferCtx.textBaseline = 'top';
-                    mainBufferCtx.fillText(input.value, x, y);
+                    mainBufferCtx.fillText(input.value, parseFloat(input.style.left), parseFloat(input.style.top));
                     mainBufferCtx.restore();
-                    renderCanvas();
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    ctx.drawImage(mainBufferCanvas, 0, 0);
                 }
                 input.remove();
             });
-
-            input.addEventListener('keydown', (ev) => {
-                if (ev.key === 'Enter') input.blur();
-            });
+            input.addEventListener('keydown', (ev) => { if (ev.key === 'Enter') input.blur(); });
         });
 
         function getPos(e) {
             const rect = canvas.getBoundingClientRect();
-            const clientX = e.clientX || (e.touches ? e.touches[0].clientX : 0);
-            const clientY = e.clientY || (e.touches ? e.touches[0].clientY : 0);
-            return { x: clientX - rect.left, y: clientY - rect.top };
+            return { x: (e.clientX || e.touches[0].clientX) - rect.left, y: (e.clientY || e.touches[0].clientY) - rect.top };
         }
 
         function startDrawing(e) {
             if (!activeTool || activeTool === 'text') return;
             isDrawing = true;
-            const pos = getPos(e);
-            strokePoints = [pos];
-
+            strokePoints = [getPos(e)];
             if (activeTool !== 'highlighter') {
                 mainBufferCtx.beginPath();
-                mainBufferCtx.moveTo(pos.x, pos.y);
+                mainBufferCtx.moveTo(strokePoints[0].x, strokePoints[0].y);
             }
             e.preventDefault();
         }
@@ -1722,64 +1599,46 @@
             if (activeTool === 'eraser') {
                 mainBufferCtx.globalCompositeOperation = 'destination-out';
                 mainBufferCtx.lineWidth = penSize * 3;
-                mainBufferCtx.globalAlpha = 1.0;
-                mainBufferCtx.lineCap = 'round';
-                mainBufferCtx.lineJoin = 'round';
-                mainBufferCtx.lineTo(pos.x, pos.y);
-                mainBufferCtx.stroke();
-                renderCanvas();
+                mainBufferCtx.lineCap = 'round'; mainBufferCtx.lineJoin = 'round';
+                mainBufferCtx.lineTo(pos.x, pos.y); mainBufferCtx.stroke();
+                ctx.clearRect(0, 0, canvas.width, canvas.height); ctx.drawImage(mainBufferCanvas, 0, 0);
             } else if (activeTool === 'highlighter') {
                 currentStrokeCtx.clearRect(0, 0, currentStrokeCanvas.width, currentStrokeCanvas.height);
                 currentStrokeCtx.beginPath();
                 currentStrokeCtx.moveTo(strokePoints[0].x, strokePoints[0].y);
-                for (let i = 1; i < strokePoints.length; i++) {
-                    currentStrokeCtx.lineTo(strokePoints[i].x, strokePoints[i].y);
-                }
-                currentStrokeCtx.strokeStyle = currentColor;
-                currentStrokeCtx.lineWidth = penSize * 4;
-                currentStrokeCtx.lineCap = 'round';
-                currentStrokeCtx.lineJoin = 'round';
-                currentStrokeCtx.stroke();
+                for (let i = 1; i < strokePoints.length; i++) currentStrokeCtx.lineTo(strokePoints[i].x, strokePoints[i].y);
+                currentStrokeCtx.strokeStyle = currentColor; currentStrokeCtx.lineWidth = penSize * 4;
+                currentStrokeCtx.lineCap = 'round'; currentStrokeCtx.lineJoin = 'round'; currentStrokeCtx.stroke();
 
-                renderCanvas();
-                ctx.save();
-                ctx.globalCompositeOperation = 'source-over';
-                ctx.globalAlpha = 0.3;
-                ctx.drawImage(currentStrokeCanvas, 0, 0);
-                ctx.restore();
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(mainBufferCanvas, 0, 0);
+                mainBufferCtx.save(); mainBufferCtx.globalAlpha = 0.3; mainBufferCtx.drawImage(currentStrokeCanvas, 0, 0); mainBufferCtx.restore();
             } else {
                 mainBufferCtx.globalCompositeOperation = 'source-over';
-                mainBufferCtx.strokeStyle = currentColor;
-                mainBufferCtx.lineWidth = penSize;
-                mainBufferCtx.globalAlpha = 1.0;
-                mainBufferCtx.lineCap = 'round';
-                mainBufferCtx.lineJoin = 'round';
-                mainBufferCtx.lineTo(pos.x, pos.y);
-                mainBufferCtx.stroke();
-                renderCanvas();
+                mainBufferCtx.strokeStyle = currentColor; mainBufferCtx.lineWidth = penSize;
+                mainBufferCtx.lineCap = 'round'; mainBufferCtx.lineJoin = 'round';
+                mainBufferCtx.lineTo(pos.x, pos.y); mainBufferCtx.stroke();
+                ctx.clearRect(0, 0, canvas.width, canvas.height); ctx.drawImage(mainBufferCanvas, 0, 0);
             }
             e.preventDefault();
         }
 
-        function stopDrawing() { 
+        function stopDrawing() {
             if (isDrawing && activeTool === 'highlighter') {
                 mainBufferCtx.save();
-                mainBufferCtx.globalCompositeOperation = 'source-over';
                 mainBufferCtx.globalAlpha = 0.3;
                 mainBufferCtx.drawImage(currentStrokeCanvas, 0, 0);
                 mainBufferCtx.restore();
                 currentStrokeCtx.clearRect(0, 0, currentStrokeCanvas.width, currentStrokeCanvas.height);
-                renderCanvas();
+                ctx.clearRect(0, 0, canvas.width, canvas.height); ctx.drawImage(mainBufferCanvas, 0, 0);
             }
-            isDrawing = false; 
-            strokePoints = [];
+            isDrawing = false; strokePoints = [];
         }
 
         canvas.addEventListener('mousedown', startDrawing);
         canvas.addEventListener('mousemove', draw);
         canvas.addEventListener('mouseup', stopDrawing);
         canvas.addEventListener('mouseleave', stopDrawing);
-
         canvas.addEventListener('touchstart', startDrawing);
         canvas.addEventListener('touchmove', draw);
         canvas.addEventListener('touchend', stopDrawing);
