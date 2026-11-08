@@ -328,13 +328,13 @@
         <button id="toolPen" class="btn-futuristic tool-btn p-2 rounded-full text-gray-400 hover:text-white transition-colors" title="Lápiz">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
         </button>
-        <!-- Marcador (Punta biselada gruesa) -->
+        <!-- Marcador -->
         <button id="toolHighlighter" class="btn-futuristic tool-btn p-2 rounded-full text-gray-400 hover:text-white transition-colors" title="Marcador">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M9.5 3h5l4 4v2.5a1 1 0 01-.3.7l-9 9a1 1 0 01-.7.3H6.5a1 1 0 01-1-1v-3.5a1 1 0 01.3-.7l3.7-3.7V3z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M3 21h18"></path></svg>
         </button>
         <!-- Texto -->
         <button id="toolText" class="btn-futuristic tool-btn p-2 rounded-full text-gray-400 hover:text-white transition-colors font-mono font-bold text-xs" title="Texto">T</button>
-        <!-- Goma / Borrador (Icono de borrador clásico) -->
+        <!-- Goma / Borrador -->
         <button id="toolEraser" class="btn-futuristic tool-btn p-2 rounded-full text-gray-400 hover:text-white transition-colors" title="Goma">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M19 21H9l-5.414-5.414a2 2 0 010-2.828l8.586-8.586a2 2 0 012.828 0L21 9.172a2 2 0 010 2.828L13 20h6v1z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="m7 11 8 8"></path></svg>
         </button>
@@ -465,7 +465,7 @@
                             <button onclick="insertSectionToken('O')" class="py-1.5 px-2 bg-zinc-800 hover:bg-indigo-600 text-zinc-200 hover:text-white rounded-lg text-xs font-bold transition border border-zinc-700/50">OTRO</button>
                             <button onclick="insertSectionToken('F')" class="py-1.5 px-2 bg-zinc-800 hover:bg-indigo-600 text-zinc-200 hover:text-white rounded-lg text-xs font-bold transition border border-zinc-700/50">FINAL</button>
                             <button onclick="insertSectionToken('INS')" class="py-1.5 px-2 bg-zinc-800 hover:bg-indigo-600 text-zinc-200 hover:text-white rounded-lg text-xs font-bold transition border border-zinc-700/50">INSTRUMENTAL</button>
-                            <button onclick="insertSectionToken('CODA)" class="py-1.5 px-2 bg-zinc-800 hover:bg-indigo-600 text-zinc-200 hover:text-white rounded-lg text-xs font-bold transition border border-zinc-700/50">CODA</button>
+                            <button onclick="insertSectionToken('CODA')" class="py-1.5 px-2 bg-zinc-800 hover:bg-indigo-600 text-zinc-200 hover:text-white rounded-lg text-xs font-bold transition border border-zinc-700/50">CODA</button>
                             <button onclick="insertSectionToken('PC')" class="py-1.5 px-2 bg-zinc-800 hover:bg-indigo-600 text-zinc-200 hover:text-white rounded-lg text-xs font-bold transition border border-zinc-700/50">PRE-CORO</button>
                         </div>
                     </div>
@@ -706,13 +706,13 @@
 
             if (clean === 'IN' || clean.includes('INTRO')) { type = 'intro'; code = 'IN'; label = 'Intro'; }
             else if (clean.startsWith('V')) { type = 'verse'; code = clean; label = 'Verso ' + clean.replace('V', ''); }
-            else if (clean === 'P' || clean.includes('PRE')) { type = 'pre'; code = 'P'; label = 'Pre-coro'; }
+            else if (clean === 'P' || clean === 'PC' || clean.includes('PRE')) { type = 'pre'; code = 'P'; label = 'Pre-coro'; }
             else if (clean.startsWith('C')) { type = 'chorus'; code = clean; label = clean === 'C' ? 'Coro' : 'Coro ' + clean.replace('C', ''); }
             else if (clean === 'B' || clean.includes('PUENTE')) { type = 'bridge'; code = 'B'; label = 'Puente'; }
             else if (clean === 'S' || clean.includes('SOLO')) { type = 'solo'; code = 'S'; label = 'Solo'; }
             else if (clean === 'O' || clean.includes('OUTRO')) { type = 'outro'; code = 'O'; label = 'Outro'; }
-            else if (clean === 'FIN' || clean.includes('FINAL')) { type = 'outro'; code = 'FIN'; label = 'Final'; }
-            else if (clean === 'INST') { type = 'solo'; code = 'INST'; label = 'Instrumental'; }
+            else if (clean === 'FIN' || clean === 'F' || clean.includes('FINAL')) { type = 'outro'; code = 'FIN'; label = 'Final'; }
+            else if (clean === 'INST' || clean === 'INS') { type = 'solo'; code = 'INST'; label = 'Instrumental'; }
             else if (clean === 'CODA') { type = 'outro'; code = 'CODA'; label = 'Coda'; }
 
             return { code, label, type, count };
@@ -1462,7 +1462,7 @@
             }
         }
 
-        // --- LÓGICA DE DIBUJO ---
+        // --- LÓGICA DE DIBUJO Y ANOTACIONES ---
         const container = document.getElementById('readerMainContainer');
         const canvas = document.getElementById('annotationCanvas');
         const ctx = canvas.getContext('2d');
@@ -1495,6 +1495,11 @@
         }
         window.addEventListener('resize', resizeCanvas);
 
+        function renderCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(mainBufferCanvas, 0, 0);
+        }
+
         btnToggleToolbar.addEventListener('click', () => {
             floatingToolbar.classList.toggle('hidden');
             if (floatingToolbar.classList.contains('hidden')) { configMenu.classList.add('hidden'); setTool(null); }
@@ -1511,6 +1516,23 @@
                 btnMap[activeTool].classList.add('bg-indigo-500/20', 'text-indigo-400', 'border', 'border-indigo-500/40');
                 canvas.classList.remove('pointer-events-none');
                 modeStatus.innerHTML = `ESTADO: <strong class="text-indigo-400 font-medium">${activeTool.toUpperCase()}</strong>`;
+                
+                if (activeTool === 'text') {
+                    sliderTitle.innerText = 'Tamaño Texto';
+                    sizeSlider.min = 12; sizeSlider.max = 60;
+                    sizeSlider.value = fontSize;
+                    sizeLabel.innerText = `${fontSize}px`; sliderVal.innerText = `${fontSize} pt`;
+                } else if (activeTool === 'highlighter') {
+                    sliderTitle.innerText = 'Grosor Resaltador';
+                    sizeSlider.min = 10; sizeSlider.max = 50;
+                    sizeSlider.value = penSize * 4;
+                    sizeLabel.innerText = `${penSize * 4}px`; sliderVal.innerText = `${penSize * 4} pt`;
+                } else {
+                    sliderTitle.innerText = 'Grosor Trazo';
+                    sizeSlider.min = 1; sizeSlider.max = 40;
+                    sizeSlider.value = penSize;
+                    sizeLabel.innerText = `${penSize}px`; sliderVal.innerText = `${penSize} pt`;
+                }
             } else {
                 canvas.classList.add('pointer-events-none');
                 modeStatus.innerHTML = 'ESTADO: <strong class="text-emerald-400 font-medium">LECTURA</strong>';
@@ -1522,8 +1544,11 @@
         toolHighlighter.addEventListener('click', () => setTool('highlighter'));
         toolText.addEventListener('click', () => setTool('text'));
         toolEraser.addEventListener('click', () => setTool('eraser'));
+        
         btnColorPicker.addEventListener('click', (e) => { e.stopPropagation(); configMenu.classList.toggle('hidden'); });
         btnSizeDisplay.addEventListener('click', (e) => { e.stopPropagation(); configMenu.classList.toggle('hidden'); });
+        window.addEventListener('click', () => configMenu.classList.add('hidden'));
+        configMenu.addEventListener('click', (e) => e.stopPropagation());
 
         document.querySelectorAll('.color-option').forEach(btn => {
             btn.addEventListener('click', (e) => {
@@ -1542,7 +1567,7 @@
         btnClearAll.addEventListener('click', () => {
             if (confirm('¿Limpiar anotaciones?')) {
                 mainBufferCtx.clearRect(0, 0, mainBufferCanvas.width, mainBufferCanvas.height);
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                renderCanvas();
                 document.querySelectorAll('.user-text-input').forEach(el => el.remove());
             }
         });
@@ -1550,11 +1575,14 @@
         container.addEventListener('click', (e) => {
             if (activeTool !== 'text') return;
             const rect = container.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
             const input = document.createElement('input');
             input.type = 'text';
             input.className = 'user-text-input absolute outline-none font-sans font-bold z-40';
-            input.style.left = `${e.clientX - rect.left}px`;
-            input.style.top = `${e.clientY - rect.top}px`;
+            input.style.left = `${x}px`;
+            input.style.top = `${y}px`;
             input.style.color = currentColor; input.style.fontSize = `${fontSize}px`;
             container.appendChild(input);
             setTimeout(() => input.focus(), 50);
@@ -1562,13 +1590,14 @@
             input.addEventListener('blur', () => {
                 if (input.value.trim() !== '') {
                     mainBufferCtx.save();
+                    mainBufferCtx.globalCompositeOperation = 'source-over';
+                    mainBufferCtx.globalAlpha = 1.0;
                     mainBufferCtx.font = `bold ${fontSize}px sans-serif`;
                     mainBufferCtx.fillStyle = currentColor;
                     mainBufferCtx.textBaseline = 'top';
-                    mainBufferCtx.fillText(input.value, parseFloat(input.style.left), parseFloat(input.style.top));
+                    mainBufferCtx.fillText(input.value, x, y);
                     mainBufferCtx.restore();
-                    ctx.clearRect(0, 0, canvas.width, canvas.height);
-                    ctx.drawImage(mainBufferCanvas, 0, 0);
+                    renderCanvas();
                 }
                 input.remove();
             });
@@ -1577,16 +1606,19 @@
 
         function getPos(e) {
             const rect = canvas.getBoundingClientRect();
-            return { x: (e.clientX || e.touches[0].clientX) - rect.left, y: (e.clientY || e.touches[0].clientY) - rect.top };
+            const clientX = e.clientX || (e.touches ? e.touches[0].clientX : 0);
+            const clientY = e.clientY || (e.touches ? e.touches[0].clientY : 0);
+            return { x: clientX - rect.left, y: clientY - rect.top };
         }
 
         function startDrawing(e) {
             if (!activeTool || activeTool === 'text') return;
             isDrawing = true;
-            strokePoints = [getPos(e)];
+            const pos = getPos(e);
+            strokePoints = [pos];
             if (activeTool !== 'highlighter') {
                 mainBufferCtx.beginPath();
-                mainBufferCtx.moveTo(strokePoints[0].x, strokePoints[0].y);
+                mainBufferCtx.moveTo(pos.x, pos.y);
             }
             e.preventDefault();
         }
@@ -1599,9 +1631,10 @@
             if (activeTool === 'eraser') {
                 mainBufferCtx.globalCompositeOperation = 'destination-out';
                 mainBufferCtx.lineWidth = penSize * 3;
+                mainBufferCtx.globalAlpha = 1.0;
                 mainBufferCtx.lineCap = 'round'; mainBufferCtx.lineJoin = 'round';
                 mainBufferCtx.lineTo(pos.x, pos.y); mainBufferCtx.stroke();
-                ctx.clearRect(0, 0, canvas.width, canvas.height); ctx.drawImage(mainBufferCanvas, 0, 0);
+                renderCanvas();
             } else if (activeTool === 'highlighter') {
                 currentStrokeCtx.clearRect(0, 0, currentStrokeCanvas.width, currentStrokeCanvas.height);
                 currentStrokeCtx.beginPath();
@@ -1610,15 +1643,19 @@
                 currentStrokeCtx.strokeStyle = currentColor; currentStrokeCtx.lineWidth = penSize * 4;
                 currentStrokeCtx.lineCap = 'round'; currentStrokeCtx.lineJoin = 'round'; currentStrokeCtx.stroke();
 
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                ctx.drawImage(mainBufferCanvas, 0, 0);
-                mainBufferCtx.save(); mainBufferCtx.globalAlpha = 0.3; mainBufferCtx.drawImage(currentStrokeCanvas, 0, 0); mainBufferCtx.restore();
+                renderCanvas();
+                ctx.save();
+                ctx.globalCompositeOperation = 'source-over';
+                ctx.globalAlpha = 0.3;
+                ctx.drawImage(currentStrokeCanvas, 0, 0);
+                ctx.restore();
             } else {
                 mainBufferCtx.globalCompositeOperation = 'source-over';
                 mainBufferCtx.strokeStyle = currentColor; mainBufferCtx.lineWidth = penSize;
+                mainBufferCtx.globalAlpha = 1.0;
                 mainBufferCtx.lineCap = 'round'; mainBufferCtx.lineJoin = 'round';
                 mainBufferCtx.lineTo(pos.x, pos.y); mainBufferCtx.stroke();
-                ctx.clearRect(0, 0, canvas.width, canvas.height); ctx.drawImage(mainBufferCanvas, 0, 0);
+                renderCanvas();
             }
             e.preventDefault();
         }
@@ -1626,11 +1663,12 @@
         function stopDrawing() {
             if (isDrawing && activeTool === 'highlighter') {
                 mainBufferCtx.save();
+                mainBufferCtx.globalCompositeOperation = 'source-over';
                 mainBufferCtx.globalAlpha = 0.3;
                 mainBufferCtx.drawImage(currentStrokeCanvas, 0, 0);
                 mainBufferCtx.restore();
                 currentStrokeCtx.clearRect(0, 0, currentStrokeCanvas.width, currentStrokeCanvas.height);
-                ctx.clearRect(0, 0, canvas.width, canvas.height); ctx.drawImage(mainBufferCanvas, 0, 0);
+                renderCanvas();
             }
             isDrawing = false; strokePoints = [];
         }
