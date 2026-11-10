@@ -929,6 +929,10 @@
             currentSong = songsToDisplay.find(s => s.id === songId);
             if (!currentSong) return;
 
+            // Limpiar lienzo y textos de la canción anterior
+            mainBufferCtx.clearRect(0, 0, mainBufferCanvas.width, mainBufferCanvas.height);
+            document.querySelectorAll('.user-text-input').forEach(el => el.remove());
+
             currentTranspose = 0;
             currentCapo = 0;
             document.getElementById('currentCapoBadge').innerText = "0";
@@ -953,7 +957,12 @@
             updateCurrentKeyDisplay();
             renderStructureBar();
             renderChart();
-            setTimeout(resizeCanvas, 100);
+            
+            // Cargar anotaciones específicas del usuario para esta canción
+            setTimeout(() => {
+                resizeCanvas();
+                loadSongAnnotations(currentSong.id);
+            }, 100);
         }
 
         function editCurrentSong() { if (currentSong) openEditModal(currentSong.id); }
@@ -1462,7 +1471,7 @@
             }
         }
 
-        // --- LÓGICA DE DIBUJO Y ANOTACIONES ---
+        // --- LÓGICA DE DIBUJO Y ANOTACIONES PERSISTENTES POR USUARIO Y CANCIÓN ---
         const container = document.getElementById('readerMainContainer');
         const canvas = document.getElementById('annotationCanvas');
         const ctx = canvas.getContext('2d');
@@ -1479,6 +1488,49 @@
         const configMenu = document.getElementById('configMenu'), sizeSlider = document.getElementById('sizeSlider'), sliderVal = document.getElementById('sliderVal'), sliderTitle = document.getElementById('sliderTitle'), btnClearAll = document.getElementById('btnClearAll');
 
         let activeTool = null, isDrawing = false, currentColor = '#facc15', penSize = 3, fontSize = 18, strokePoints = [];
+        let saveTimeout = null;
+
+        // Cargar anotaciones de la canción desde Firestore
+        async function loadSongAnnotations(songId) {
+            if (!currentUser || !songId) return;
+            try {
+                const docRef = db.collection("users").doc(currentUser.uid).collection("annotations").doc(songId);
+                const doc = await docRef.get();
+                
+                mainBufferCtx.clearRect(0, 0, mainBufferCanvas.width, mainBufferCanvas.height);
+                document.querySelectorAll('.user-text-input').forEach(el => el.remove());
+
+                if (doc.exists && doc.data().imageData) {
+                    const img = new Image();
+                    img.onload = () => {
+                        mainBufferCtx.drawImage(img, 0, 0);
+                        renderCanvas();
+                    };
+                    img.src = doc.data().imageData;
+                } else {
+                    renderCanvas();
+                }
+            } catch (e) {
+                console.error("Error al cargar anotaciones:", e);
+            }
+        }
+
+        // Guardar anotaciones de la canción en Firestore
+        function saveSongAnnotations() {
+            if (!currentUser || !currentSong) return;
+            clearTimeout(saveTimeout);
+            saveTimeout = setTimeout(async () => {
+                try {
+                    const imageData = mainBufferCanvas.toDataURL("image/png");
+                    await db.collection("users").doc(currentUser.uid).collection("annotations").doc(currentSong.id).set({
+                        imageData: imageData,
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                } catch (e) {
+                    console.error("Error al guardar anotaciones:", e);
+                }
+            }, 800);
+        }
 
         function resizeCanvas() {
             if (!container) return;
@@ -1569,6 +1621,7 @@
                 mainBufferCtx.clearRect(0, 0, mainBufferCanvas.width, mainBufferCanvas.height);
                 renderCanvas();
                 document.querySelectorAll('.user-text-input').forEach(el => el.remove());
+                saveSongAnnotations();
             }
         });
 
@@ -1598,6 +1651,7 @@
                     mainBufferCtx.fillText(input.value, x, y);
                     mainBufferCtx.restore();
                     renderCanvas();
+                    saveSongAnnotations();
                 }
                 input.remove();
             });
@@ -1669,6 +1723,9 @@
                 mainBufferCtx.restore();
                 currentStrokeCtx.clearRect(0, 0, currentStrokeCanvas.width, currentStrokeCanvas.height);
                 renderCanvas();
+            }
+            if (isDrawing) {
+                saveSongAnnotations();
             }
             isDrawing = false; strokePoints = [];
         }
