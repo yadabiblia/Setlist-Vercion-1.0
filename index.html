@@ -454,7 +454,7 @@
                 <!-- COLUMNA IZQUIERDA (2 APARTADOS) -->
                 <div class="lg:col-span-5 flex flex-col gap-4">
                     
-                    <!-- APARTADO 1 SUPERIOR: SECCIONES (ABREVIATURAS LIMPIAS) -->
+                    <!-- APARTADO 1 SUPERIOR: SECCIONES -->
                     <div class="bg-zinc-900/70 border border-zinc-800 rounded-xl p-3.5 flex flex-col gap-2">
                         <span class="text-[10px] font-mono tracking-wider text-indigo-400 uppercase font-bold">1. Secciones de la canción</span>
                         <div class="grid grid-cols-3 gap-1.5">
@@ -693,7 +693,6 @@
             }
         }
 
-        // PARSER DE SECCIÓN LIMPIO Y SIN DUPLICIDADES
         function parseSectionTag(rawTag) {
             let clean = rawTag.trim().toUpperCase();
             let count = null;
@@ -1009,7 +1008,6 @@
             });
         }
 
-        // SOPORTE ROBUSTO PARA AMBOS FORMATOS DE ACORDES ({D} arriba o {D}en línea)
         function formatLineToHtml(lineText, isPrint = false) {
             let regex = /\{(.*?)\}/g;
             let html = '';
